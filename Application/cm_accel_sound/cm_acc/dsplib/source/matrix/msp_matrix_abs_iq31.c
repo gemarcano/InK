@@ -38,10 +38,10 @@
 msp_status msp_matrix_abs_iq31(const msp_matrix_abs_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     msp_abs_iq31_params paramsTemp;
-    
+
     /* Use real vector absolute value function. */
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_abs_iq31(&paramsTemp, src, dst);
 }
 

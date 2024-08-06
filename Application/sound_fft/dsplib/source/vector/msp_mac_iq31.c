@@ -40,7 +40,7 @@ msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, co
     uint16_t length;
     msp_status status;
     MSP_LEA_MACLONG_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -67,7 +67,7 @@ msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, co
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MACLONG_PARAMS structure. */
     leaParams = (MSP_LEA_MACLONG_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MACLONG_PARAMS)/sizeof(uint32_t));
 
@@ -96,10 +96,10 @@ msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, co
 
     /* Free MSP_LEA_MACLONG_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_MACLONG_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -118,30 +118,30 @@ msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, co
     return status;
 }
 
-#else //MSP_USE_LEA    
-    
+#else //MSP_USE_LEA
+
 msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *result)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
     /* Initialize the result. */
     *result = 0;
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN | MPYSAT;
 #endif //__MSP430_HAS_MPY32__
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Multiply srcA and srcB and accumulate to the result. */
         *result += __q31mpy(*srcA++,*srcB++);
     }
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     /* Restore MPY32 control context. */
     MPY32CTL0 = ui16MPYState;

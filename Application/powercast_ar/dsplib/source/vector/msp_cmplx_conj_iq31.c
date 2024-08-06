@@ -40,7 +40,7 @@ msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _
     uint16_t length;
     msp_status status;
     MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the vector length. */
     length = params->length;
 
@@ -65,7 +65,7 @@ msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -106,10 +106,10 @@ msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _
 
     /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -133,10 +133,10 @@ msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _
 msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the vector length. */
     length = params->length;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Take the complex conjugate of src and store to dst. */

@@ -38,10 +38,10 @@
 msp_status msp_matrix_sub_q15(const msp_matrix_sub_q15_params *params, const int16_t *srcA, const int16_t *srcB, int16_t *dst)
 {
     msp_sub_q15_params paramsTemp;
-    
+
     /* Use real vector subtraction function. */
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_sub_q15(&paramsTemp, srcA, srcB, dst);
 }
 

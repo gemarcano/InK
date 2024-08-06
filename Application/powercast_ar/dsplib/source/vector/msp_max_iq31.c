@@ -66,13 +66,13 @@ msp_status msp_max_iq31(const msp_max_iq31_params *params, const _iq31 *src, _iq
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MAXLONG_PARAMS structure. */
     leaParams = (MSP_LEA_MAXLONG_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MAXLONG_PARAMS)/sizeof(uint32_t));
 
     /* Allocate output vector of length two. */
     output = (int32_t *)msp_lea_allocMemory(2*sizeof(uint32_t)/sizeof(uint32_t));
-    
+
     /* Set MSP_LEA_MAXLONG_PARAMS structure. */
     leaParams->vectorSize = length;
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(output);

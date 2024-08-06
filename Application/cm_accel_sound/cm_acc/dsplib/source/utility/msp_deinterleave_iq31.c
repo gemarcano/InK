@@ -52,7 +52,7 @@ msp_status msp_deinterleave_iq31(const msp_deinterleave_iq31_params *params, con
     if (channel > numChannels) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4))) {
@@ -69,7 +69,7 @@ msp_status msp_deinterleave_iq31(const msp_deinterleave_iq31_params *params, con
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_DEINTERLEAVELONG_PARAMS structure. */
     leaParams = (MSP_LEA_DEINTERLEAVELONG_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_DEINTERLEAVELONG_PARAMS)/sizeof(uint32_t));
 

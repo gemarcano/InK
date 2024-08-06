@@ -1,32 +1,32 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ink.h"
 #include <stdbool.h>
 
-//cuckoo specific definitions 
+//cuckoo specific definitions
 #define NUM_BUCKETS 128 // must be a power of 2
 #define NUM_INSERTS (NUM_BUCKETS / 4) // shoot for 25% occupancy
 #define NUM_LOOKUPS NUM_INSERTS
@@ -103,7 +103,7 @@ __shared(
     value_t _v_lookup_count;
     value_t _v_member_count;
     bool _v_success;
-    bool _v_member;    
+    bool _v_member;
 )
 
 ENTRY_TASK(task_init);
@@ -180,18 +180,18 @@ ENTRY_TASK(task_init){
     __SET( _v_next_task , t_insert);
 
 
-    
+
     return task_generate_key;
 }
 
 TASK(task_init_array){
 
         unsigned i;
-        
+
         for (i = 0; i < BUFFER_SIZE - 1; ++i) {
             __SET(_v_filter[i + __GET(_v_index)*(BUFFER_SIZE-1)] , 0);
         }
-        
+
         __SET(_v_index, ++__GET(_v_index));
 
         if ( __GET(_v_index) == NUM_BUCKETS/(BUFFER_SIZE-1)) {
@@ -212,11 +212,11 @@ TASK(task_generate_key){
     uint16_t __cry;
     uint16_t next;
 
-    __cry = (__GET(_v_key) + 1) * 17; 
+    __cry = (__GET(_v_key) + 1) * 17;
     __SET(_v_key, __cry);
-   
+
     enum task_index next_task = __GET(_v_next_task);
-    
+
     if (next_task == t_insert) {
         return task_insert;
     } else if (next_task == t_lookup) {
@@ -232,7 +232,7 @@ TASK(task_calc_indexes){
     __cry = hash_to_fingerprint(__GET(_v_key));
     __SET(_v_fingerprint , __cry);
 
-    return task_calc_indexes_index_1;        
+    return task_calc_indexes_index_1;
 }
 
 TASK(task_calc_indexes_index_1){
@@ -295,10 +295,10 @@ TASK(task_add){
 	        __SET(_v_success , true);
             __cry = fingerprint;
             __SET(_v_filter[__cry_idx2], __cry);
-        
+
             return task_insert_done;
 
-        } else { 
+        } else {
         	// evict one of the two entries
             fingerprint_t fp_victim;
             index_t index_victim;
@@ -331,20 +331,20 @@ TASK(task_relocate){
     index_t index2_victim = __GET(_v_index1) ^ fp_hash_victim;
 
     if (!__GET(_v_filter[index2_victim])) { // slot was free
-    
+
         __SET(_v_success, true);
         __SET(_v_filter[index2_victim], fp_victim);
-    
+
         return task_insert_done;
-    
+
     } else {
 
     	 // slot was occupied, rellocate the next victim
         if (__GET(_v_relocation_count) >= MAX_RELOCATIONS) { // insert failed
             __SET(_v_success, false);
-        
+
             return task_insert_done;
-        
+
         }
 
         __SET(_v_relocation_count, ++__GET(_v_relocation_count));
@@ -352,9 +352,9 @@ TASK(task_relocate){
         __cry = __GET(_v_filter[index2_victim]);
         __SET(_v_fingerprint, __cry);
         __SET(_v_filter[index2_victim], fp_victim);
-    
+
         return task_relocate;
-    
+
     }
 }
 
@@ -369,18 +369,18 @@ TASK(task_insert_done){
 
 
     if (__GET(_v_insert_count) < NUM_INSERTS) {
-        
+
         __SET(_v_next_task, t_insert);
-        
+
         return task_generate_key;
-    
+
     } else {
 
         __SET(_v_next_task, t_lookup);
         __SET(_v_key, init_key);
-        
+
         return task_generate_key;
-    
+
     }
 
 }
@@ -434,7 +434,7 @@ TASK(task_lookup_done){
 }
 
 TASK(task_print_stats){
-    
+
     __no_operation();
 
     return task_done;
@@ -460,6 +460,6 @@ TASK(task_done)
 //     tmp[1] = __get_time();
 //     __get_time_stop();
 // #endif
-    
+
     return task_init;
 }

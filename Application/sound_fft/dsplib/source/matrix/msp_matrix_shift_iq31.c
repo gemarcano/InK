@@ -38,10 +38,10 @@
 msp_status msp_matrix_shift_iq31(const msp_matrix_shift_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     msp_shift_iq31_params paramsTemp;
-    
+
     /* Use real vector shift function. */
     paramsTemp.shift = params->shift;
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_shift_iq31(&paramsTemp, src, dst);
 }

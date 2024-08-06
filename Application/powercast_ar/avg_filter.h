@@ -5,8 +5,8 @@
 #include <stdio.h>
 /* Size of the data buffer; length of the sequence. */
 #define NWIDTH 3
-/* Smaller than any datum */ 
-#define STOPPER 0 
+/* Smaller than any datum */
+#define STOPPER 0
 
 unsigned int medfilter(unsigned int datum);
 

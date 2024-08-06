@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -92,7 +92,7 @@ uint8_t i2c_read(uint8_t slv_addr, uint8_t reg_addr){
     UCB2CTLW0 |= UCTXSTP;                   // STOP condition
 
 //    while(!(UCB2IFG & UCRXIFG0)){
-    
+
         data = UCB2RXBUF;
         if (data != 0x00){
             UCB2RXBUF = 0x00;
@@ -151,7 +151,7 @@ void i2c_write_single(uint8_t slv_addr, uint8_t reg_addr){
     UCB2TXBUF = reg_addr;
     __delay_cycles(10);
     while(!(UCB2IFG & UCTXIFG0));
-    
+
     UCB2CTLW0 |= UCTXSTP;
     while(UCB2CTLW0 & UCTXSTP);             // wait for stop
     __enable_interrupt();

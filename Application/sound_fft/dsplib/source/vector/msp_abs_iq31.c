@@ -38,10 +38,10 @@
 msp_status msp_abs_iq31(const msp_abs_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Compute the absolute value of src and store to dst. */

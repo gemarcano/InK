@@ -1,29 +1,29 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <msp430.h> 
+#include <msp430.h>
 #include <stdint.h>
 
 //#define ACC
@@ -45,7 +45,7 @@
 #define FREE 166
 #define STOP 26
 
-//Boundaries in "amplitude" for raising a pin 
+//Boundaries in "amplitude" for raising a pin
 #define BOUND_SINGAL 1900
 #define BOUND_ACC 900
 
@@ -79,7 +79,7 @@ static uint16_t counted	 = 0;
 
 //forward declarations
 void setup_mcu();
-void uartSend(unsigned char *pucData, uint8_t ucLength); 
+void uartSend(unsigned char *pucData, uint8_t ucLength);
 void interrupt_pin_raise(uint16_t data, uint8_t cur_flag);
 void led_state();
 void blink_on();
@@ -93,7 +93,7 @@ int main(void)
     P3OUT |= BIT5;
     P3OUT &= ~BIT5;
 #endif
-	
+
 	//enable interrupts;
 	__bis_SR_register(GIE);
 	 while (1)
@@ -122,7 +122,7 @@ int main(void)
 			i = 0;
 		}
 	}
-		
+
 }
 
 void interrupt_pin_raise(uint16_t data, uint8_t cur_flag){
@@ -132,16 +132,16 @@ void interrupt_pin_raise(uint16_t data, uint8_t cur_flag){
 	{
 		counted = 0;
 		if (data_acc[data] >= bound_acc)
-		{	
+		{
 #ifndef STAY_UP
 			P3OUT |= BIT4 | BIT5;
 			P3OUT &= ~(BIT4 | BIT5);
 			P1OUT |= BIT1;
-#else 
+#else
 			P3OUT |= BIT4 | BIT5;
 			__delay_cycles(2000);
 			P3OUT &= ~(BIT4 | BIT5);
-			P1OUT |= BIT1;		
+			P1OUT |= BIT1;
 #endif
 		}
 		else
@@ -157,7 +157,7 @@ void interrupt_pin_raise(uint16_t data, uint8_t cur_flag){
 		P1OUT |= BIT0;
 		P3OUT |= BIT3 | BIT6;
 		P3OUT &= ~(BIT3 | BIT6);
-#else 
+#else
 		P3OUT |= BIT3 | BIT6;
 		__delay_cycles(2000);
 		P3OUT &= ~(BIT3 | BIT6);
@@ -176,16 +176,16 @@ void interrupt_pin_raise(uint16_t data, uint8_t cur_flag){
 }
 
 void blink_off(){
-	//debug led 
+	//debug led
 	P1OUT &= ~(BIT0 | BIT1);
 }
 
 void blink_on(){
-	//debug led  
+	//debug led
 }
 
 void led_state(){
-	
+
 	//debug blink ;)
 	P1OUT &= ~BIT1;
 	P1OUT |=  BIT0;
@@ -264,7 +264,7 @@ void setup_mcu(){
 	P1OUT &= ~BIT1;                           // Clear P1.0 output latch
 	P1DIR |= BIT1;                            // For LED on P1.0
 
-	P3OUT &= ~(BIT4|BIT5|BIT6| BIT3);		  //Set up pin 3.4-3.5 for accel notify 
+	P3OUT &= ~(BIT4|BIT5|BIT6| BIT3);		  //Set up pin 3.4-3.5 for accel notify
    	P3DIR |= BIT4 | BIT5 | BIT6 | BIT3;		  //Set up pin 3.3-3.6 for signal2 notify
 
     PM5CTL0 &= ~LOCKLPM5;                   // Disable the GPIO power-on default high-impedance mode

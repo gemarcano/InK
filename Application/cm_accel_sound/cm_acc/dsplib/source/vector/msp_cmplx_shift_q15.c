@@ -35,7 +35,7 @@
 /*
  * Optimized helper function for shift right with complex conjugate, used for
  * inverse FFT functions.
- */    
+ */
 static inline msp_status msp_cmplx_shift_right_conj_q15(const _q15 *src, _q15 *dst, uint16_t length, uint8_t shift);
 
 /*
@@ -47,7 +47,7 @@ msp_status msp_cmplx_shift_q15(const msp_cmplx_shift_q15_params *params, const _
     uint16_t length;
     msp_shift_q15_params shiftParams;
     msp_cmplx_conj_q15_params conjParams;
-    
+
     /* Initialize the loop counter and shift variables. */
     length = params->length;
     shift = params->shift;
@@ -93,14 +93,14 @@ msp_status msp_cmplx_shift_q15(const msp_cmplx_shift_q15_params *params, const _
 
 /* Shift factor lookup table. */
 extern const uint16_t msp_shift_right_factor_q15[16];
-    
+
 static inline msp_status msp_cmplx_shift_right_conj_q15(const _q15 *src, _q15 *dst, uint16_t length, uint8_t shift)
 {
     int16_t shiftValue;
     int16_t *shiftVector;
     msp_status status;
     MSP_LEA_MPYMATRIX_PARAMS *leaParams;
-    
+
     /* Lookup the fractional shift value. */
     shiftValue = msp_shift_right_factor_q15[shift & 0xf];
 
@@ -120,10 +120,10 @@ static inline msp_status msp_cmplx_shift_right_conj_q15(const _q15 *src, _q15 *d
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MPYMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate shift vector of length two. */
     shiftVector = (int16_t *)msp_lea_allocMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     shiftVector[0] = shiftValue;
@@ -147,10 +147,10 @@ static inline msp_status msp_cmplx_shift_right_conj_q15(const _q15 *src, _q15 *d
     /* Free MSP_LEA_MPYMATRIX_PARAMS structure and shift vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -170,9 +170,9 @@ static inline msp_status msp_cmplx_shift_right_conj_q15(const _q15 *src, _q15 *d
 }
 
 #else //MSP_USE_LEA
-    
+
 static inline msp_status msp_cmplx_shift_right_conj_q15(const _q15 *src, _q15 *dst, uint16_t length, uint8_t shift)
-{    
+{
     /* Loop through all vector elements. */
     while (length--) {
         /* Shift src right by the negated shift parameter and store to dst. */

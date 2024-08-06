@@ -16,7 +16,7 @@ __nv uint16_t idx = 0;
 void framLog(float arg1, uint8_t arg2, float arg3)
 {
 
-    //circular logger 
+    //circular logger
     index_data[log_index]   = idx++; //global index
     angle_data[log_index]   = arg1;
     state_data[log_index]   = arg2;

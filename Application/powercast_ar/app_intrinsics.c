@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -38,12 +38,12 @@ inline uint8_t valid_signal(void){
 #ifndef EMULATE
   //__disable_interrupt();
   uint8_t acc_data[NUM_BYTES_RX];
-  //get samples 
+  //get samples
   i2c_init();
   i2c_write(ADXL_345 , ADXL_CONF_REG , 0x00);
   i2c_write(ADXL_345, ADXL_CONF_REG, 0x10);
   i2c_write(ADXL_345, ADXL_CONF_REG, 0x08);
-  
+
   uint8_t collected = 0;
   uint16_t tmp,current;
 
@@ -58,11 +58,11 @@ inline uint8_t valid_signal(void){
 
   __delay_cycles(FILTER_DURATION);
   uint16_t current = 1;
-  
+
 #endif
   //__enable_interrupt();
   // P2OUT &= ~BIT2;
-  
+
   if (current < BOUND ) return 1;
   else return 0;
 }
@@ -88,22 +88,22 @@ void ADC_config()
     // Pin P1.3 set for Ternary Module Function (which includes A3)
     P1SEL0 |= BIT3;
     P1SEL1 |= BIT3;
- 
+
     // Clear ENC bit to allow register settings
     ADC12CTL0 &= ~ADC12ENC;
- 
+
     // Sample-and-hold source select
     //
     // 000 -> ADC12SC bit (default)
     // ADC12CTL1 &= ~(ADC12SHS0 | ADC12SHS1 | ADC12SHS2);
- 
+
     // Clock source select
     //
     // source: MCLK (DCO, 1 MHz)
     // pre-divider: 4
     // divider: 4
     ADC12CTL1 |= ADC12SSEL_2 | ADC12PDIV_1 | ADC12DIV_3;
- 
+
     // sampling period select for MEM0: 64 clock cycles (*)
     // multiple sample and conversion: enabled
     // ADC module ON
@@ -111,30 +111,30 @@ void ADC_config()
     // (*) freq = MCLK / (ADC12PDIV_0 * ADC12DIV_0 * ADC12SHT0_4)
     //          = 1000000 / (4 * 4 * 16)
     //          = 3906 Hz
- 
+
     // conversion sequence mode: repeat-single-channel
     // pulse-mode select: SAMPCON signal is sourced from the sampling timer
     ADC12CTL1 |= ADC12CONSEQ_2 | ADC12SHP;
- 
+
     // resolution: 12 bit
     // data format: right-aligned, unsigned
     ADC12CTL2 |= ADC12RES__12BIT;
     ADC12CTL2 &= ~ADC12DF;
- 
+
     // conversion start address: MEM0
     ADC12CTL3 |= ADC12CSTARTADD_0;
- 
+
     // MEM0 control register
     // reference select: VR+ = AVCC (3V), VR- = AVSS (0V)
     // input channel select: A3
     ADC12MCTL0 |= ADC12VRSEL_0 | ADC12INCH_3;
- 
+
     // Clear interrupt for MEM0
     ADC12IFGR0 &= ~ADC12IFG0;
- 
+
     // Enable interrupt for (only) MEM0
     ADC12IER0 = ADC12IE0;
- 
+
     // Trigger first conversion (Enable conversion and Start conversion)
     ADC12CTL0 |= ADC12ENC | ADC12SC;
 }

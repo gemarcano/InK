@@ -60,10 +60,10 @@ msp_status msp_fill_q15(const msp_fill_q15_params *params, _q15 *dst)
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate fill vector of length two. */
     fillVector = (int16_t *)msp_lea_allocMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     fillVector[0] = params->value;
@@ -87,10 +87,10 @@ msp_status msp_fill_q15(const msp_fill_q15_params *params, _q15 *dst)
     /* Free MSP_LEA_ADDMATRIX_PARAMS structure and fill vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {

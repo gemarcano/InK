@@ -39,7 +39,7 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     uint16_t length;
     msp_status status;
     MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the vector length. */
     length = params->length;
 
@@ -61,7 +61,7 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -82,10 +82,10 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
 
     /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -103,16 +103,16 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_freeLock();
     return status;
 }
-    
+
 #else //MSP_USE_LEA
 
 msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the vector length. */
     length = params->length;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Add srcA and srcB with saturation and store result. */

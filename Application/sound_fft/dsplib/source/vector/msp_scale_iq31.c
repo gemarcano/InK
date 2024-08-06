@@ -43,7 +43,7 @@ msp_status msp_scale_iq31(const msp_scale_iq31_params *params, const _iq31 *src,
     uint8_t shift;
     uint16_t length;
     int32_t scale;
-    
+
     /* Initialize the loop counter, scale and shift variables. */
     length = params->length;
     scale = params->scale;
@@ -55,14 +55,14 @@ msp_status msp_scale_iq31(const msp_scale_iq31_params *params, const _iq31 *src,
         return MSP_SHIFT_SIZE_ERROR;
     }
 #endif //MSP_DISABLE_DIAGNOSTICS
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     int32_t result;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
-    
+
     /* Load scale arguments once. */
     MPYS32L = (uint16_t)scale;
     MPYS32H = (uint16_t)(scale >> 16);
@@ -71,7 +71,7 @@ msp_status msp_scale_iq31(const msp_scale_iq31_params *params, const _iq31 *src,
     if (shift >= 16) {
         /* Decrement shift and use registers offset by 16-bits. */
         shift -= 16;
-        
+
         /* Loop through all vector elements. */
         while (length--) {
             /* Multiply src and the combined scale and shift value. */
@@ -105,7 +105,7 @@ msp_status msp_scale_iq31(const msp_scale_iq31_params *params, const _iq31 *src,
 #else //__MSP430_HAS_MPY32__
     /* Recalculate shift value to be a shift right offset by the default Q15 shift by 15. */
     shift = 31 - shift;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Multiply src by scale and shift result right by the offset shift value. */

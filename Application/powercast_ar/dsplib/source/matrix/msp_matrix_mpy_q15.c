@@ -171,7 +171,7 @@ msp_status msp_matrix_mpy_q15(const msp_matrix_mpy_q15_params *params, const _q1
             /* Reset result accumulator. */
             MPY32CTL0 &= ~MPYC;
             RESLO = 0; RESHI = 0;
-            
+
             /* Loop through all elements in srcA column and srcB row. */
             while(cntr < srcACols) {
                 MACS = srcA[row_offset + cntr];
@@ -179,7 +179,7 @@ msp_status msp_matrix_mpy_q15(const msp_matrix_mpy_q15_params *params, const _q1
                 col_offset += srcBCols;
                 cntr++;
             }
-            
+
             /* Store the result */
             dst[dst_row_offset + dst_col] = RESHI;
 
@@ -208,7 +208,7 @@ msp_status msp_matrix_mpy_q15(const msp_matrix_mpy_q15_params *params, const _q1
         while (dst_col < srcBCols) {
             /* Initialize accumulator. */
             result = 0;
-            
+
             /* Loop through all elements in srcA column and srcB row. */
             while(cntr < srcACols) {
                 result += (_iq31)srcA[row_offset + cntr] * (_iq31)srcB[col_offset + dst_col];

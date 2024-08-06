@@ -53,7 +53,7 @@ msp_status msp_fir_q15(const msp_fir_q15_params *params, const _q15 *src, _q15 *
     if ((tapLength & 1) || (outputLength & 1)) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the length is a power of two if circular buffer is enabled. */
     if (enableCircBuf && (outputLength & (outputLength-1))) {
         return MSP_SIZE_ERROR;

@@ -41,7 +41,7 @@ msp_status msp_q15_to_iq31(const msp_q15_to_iq31_params *params, const _q15 *src
 
     /* Initialize the vector length. */
     length = params->length;
-    
+
     /* Fill destination with zeros. */
     fillParams.length = length;
     fillParams.value = 0;

@@ -1,41 +1,41 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas" 
+//
+// author = "dpatoukas"
 // maintainer = "dpatoukas"
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "persistent_timer.h"
 
 
-// 0 persistent - 1 dirty persistent 
-// double buffer 
+// 0 persistent - 1 dirty persistent
+// double buffer
 __nv pers_timer_t pers_timer_vars[2];
 
 void _pers_timer_init(){
 	uint8_t i;
 	for (i = 0; i < MAX_TIMED_THREADS; i++)
 	{
-			pers_timer_vars[0].wkup_timing[i].status = NOT_USED; 
-			pers_timer_vars[0].xpr_timing[i].status = NOT_USED; 
-			pers_timer_vars[0].pdc_timing[i].status = NOT_USED; 
+			pers_timer_vars[0].wkup_timing[i].status = NOT_USED;
+			pers_timer_vars[0].xpr_timing[i].status = NOT_USED;
+			pers_timer_vars[0].pdc_timing[i].status = NOT_USED;
 	}
 }
 
@@ -59,7 +59,7 @@ void _pers_timer_update_data(uint8_t idx,ink_time_interface_t interface , uint32
 			break;
 	}
 
-		
+
 }
 
 void _pers_timer_update_thread_id(uint8_t idx,ink_time_interface_t interface , uint8_t thread_id){
@@ -141,16 +141,16 @@ switch (interface)
 //commit into the persistent buffer
 
 void _commit_timer_buffers(ink_time_interface_t interface){
-	
+
 	uint8_t i;
-	
+
 	switch (interface){
 		case WKUP:
 		for (i = 0; i < MAX_WKUP_THREADS; i++)
 		{
 			if (pers_timer_vars[1].wkup_timing[i].__dirty == DIRTY)
 			{
-				
+
 				pers_timer_vars[0].wkup_timing[i] = pers_timer_vars[1].wkup_timing[i];
 				pers_timer_vars[0].wkup_timing[i].__dirty = NOT_DIRTY;
 			}
@@ -161,7 +161,7 @@ void _commit_timer_buffers(ink_time_interface_t interface){
 		{
 			if (pers_timer_vars[1].xpr_timing[i].__dirty == DIRTY)
 			{
-				
+
 				pers_timer_vars[0].xpr_timing[i] = pers_timer_vars[1].xpr_timing[i];
 				pers_timer_vars[0].xpr_timing[i].__dirty = NOT_DIRTY;
 			}
@@ -172,7 +172,7 @@ void _commit_timer_buffers(ink_time_interface_t interface){
 		{
 			if (pers_timer_vars[1].pdc_timing[i].__dirty == DIRTY)
 			{
-				
+
 				pers_timer_vars[0].pdc_timing[i] = pers_timer_vars[1].pdc_timing[i];
 				pers_timer_vars[0].pdc_timing[i].__dirty = NOT_DIRTY;
 			}
@@ -180,15 +180,15 @@ void _commit_timer_buffers(ink_time_interface_t interface){
 		break;
 	default:
 		break;
-	}	
+	}
 
 	for (i = 0; i < TIMER_TOOLS; i++)
 	{
 		if (	pers_timer_vars[1].next_info[interface].__dirty == DIRTY)
 		{
-			pers_timer_vars[0].next_info[interface] = 
+			pers_timer_vars[0].next_info[interface] =
 				pers_timer_vars[1].next_info[interface];
-			pers_timer_vars[0].next_info[interface].__dirty = 
+			pers_timer_vars[0].next_info[interface].__dirty =
 				NOT_DIRTY;
 		}
 	}
@@ -235,7 +235,7 @@ timing_d _pers_timer_get(uint8_t idx,ink_time_interface_t interface ){
 		default:
 		    return pers_timer_vars[0].wkup_timing[idx];
 	}
-		
+
 }
 
 uint16_t _pers_timer_get_data(uint8_t idx,ink_time_interface_t interface ){
@@ -243,11 +243,11 @@ uint16_t _pers_timer_get_data(uint8_t idx,ink_time_interface_t interface ){
 	switch (interface)
 	{
 		case WKUP:
-			return pers_timer_vars[0].wkup_timing[idx].data ;		
+			return pers_timer_vars[0].wkup_timing[idx].data ;
 		case XPR:
-			return pers_timer_vars[0].xpr_timing[idx].data ;			
+			return pers_timer_vars[0].xpr_timing[idx].data ;
 		case PDC:
-			return pers_timer_vars[0].pdc_timing[idx].data ;			
+			return pers_timer_vars[0].pdc_timing[idx].data ;
 		default:
 			return 0;
 

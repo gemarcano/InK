@@ -38,11 +38,11 @@
 msp_status msp_matrix_scale_iq31(const msp_matrix_scale_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     msp_scale_iq31_params paramsTemp;
-    
+
     /* Use real vector scale function. */
     paramsTemp.shift = params->shift;
     paramsTemp.length = params->rows * params->cols;
     paramsTemp.scale = params->scale;
-    
+
     return msp_scale_iq31(&paramsTemp, src, dst);
 }

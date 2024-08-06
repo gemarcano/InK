@@ -41,7 +41,7 @@ msp_status msp_offset_q15(const msp_offset_q15_params *params, const _q15 *src, 
     int16_t *offsetVector;
     msp_status status;
     MSP_LEA_ADDMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter and offset. */
     length = params->length;
     q15Offset = params->offset;
@@ -51,7 +51,7 @@ msp_status msp_offset_q15(const msp_offset_q15_params *params, const _q15 *src, 
     if (length & 1) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4))) {
@@ -68,10 +68,10 @@ msp_status msp_offset_q15(const msp_offset_q15_params *params, const _q15 *src, 
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate offset vector of length two. */
     offsetVector = (int16_t *)msp_lea_allocMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     offsetVector[0] = q15Offset;
@@ -95,10 +95,10 @@ msp_status msp_offset_q15(const msp_offset_q15_params *params, const _q15 *src, 
     /* Free MSP_LEA_ADDMATRIX_PARAMS structure and offset vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -123,7 +123,7 @@ msp_status msp_offset_q15(const msp_offset_q15_params *params, const _q15 *src, 
 {
     uint16_t length;
     _q15 q15Offset;
-    
+
     /* Initialize the loop counter and offset. */
     length = params->length;
     q15Offset = params->offset;

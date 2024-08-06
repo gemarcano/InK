@@ -34,7 +34,7 @@
 
 /*
  * Optimized helper function for right shift operations with LEA.
- */    
+ */
 static inline msp_status msp_shift_right_q15(const _q15 *src, _q15 *dst, uint16_t length, uint8_t shift);
 
 /*
@@ -44,7 +44,7 @@ msp_status msp_shift_q15(const msp_shift_q15_params *params, const _q15 *src, _q
 {
     int8_t shift;               // Shift count
     uint16_t length;            // Shift length
-    
+
     /* Initialize the loop counter and shift variables. */
     length = params->length;
     shift = params->shift;
@@ -57,7 +57,7 @@ msp_status msp_shift_q15(const msp_shift_q15_params *params, const _q15 *src, _q
 #endif //MSP_DISABLE_DIAGNOSTICS
 
     /* Shift src array left for a positive shift parameter. */
-    if (shift > 0) {  
+    if (shift > 0) {
         /* Loop through all vector elements. */
         while (length--) {
             /* Shift src left by the shift parameter and store to dst. */
@@ -69,7 +69,7 @@ msp_status msp_shift_q15(const msp_shift_q15_params *params, const _q15 *src, _q
         /* Use optimized helper function. */
         return msp_shift_right_q15(src, dst, length, -shift);
     }
-    
+
     return MSP_SUCCESS;
 }
 
@@ -77,24 +77,24 @@ msp_status msp_shift_q15(const msp_shift_q15_params *params, const _q15 *src, _q
 
 /* Shift factor lookup table. */
 const uint16_t msp_shift_right_factor_q15[16] = {
-    0x8000, 0x4000, 0x2000, 0x1000, 0x0800, 0x0400, 0x0200, 0x0100, 
+    0x8000, 0x4000, 0x2000, 0x1000, 0x0800, 0x0400, 0x0200, 0x0100,
     0x0080, 0x0040, 0x0020, 0x0010, 0x0008, 0x0004, 0x0002, 0x0001
 };
-    
+
 static inline msp_status msp_shift_right_q15(const _q15 *src, _q15 *dst, uint16_t length, uint8_t shift)
 {
     int16_t shiftValue;
     int16_t *shiftVector;
     msp_status status;
     MSP_LEA_MPYMATRIX_PARAMS *leaParams;
-    
+
     /* If shift is zero and source and data are not the same array copy data. */
     if ((shift == 0) && (src != dst)) {
         msp_copy_q15_params copyParams;
         copyParams.length = length;
         return msp_copy_q15(&copyParams, src, dst);
     }
-    
+
     /* Lookup the fractional shift value. */
     shiftValue = msp_shift_right_factor_q15[shift & 0xf];
 
@@ -114,10 +114,10 @@ static inline msp_status msp_shift_right_q15(const _q15 *src, _q15 *dst, uint16_
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MPYMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate offset vector of length two. */
     shiftVector = (int16_t *)msp_lea_allocMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     shiftVector[0] = shiftValue;
@@ -141,10 +141,10 @@ static inline msp_status msp_shift_right_q15(const _q15 *src, _q15 *dst, uint16_
     /* Free MSP_LEA_MPYMATRIX_PARAMS structure and shift vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -164,9 +164,9 @@ static inline msp_status msp_shift_right_q15(const _q15 *src, _q15 *dst, uint16_
 }
 
 #else //MSP_USE_LEA
-    
+
 static inline msp_status msp_shift_right_q15(const _q15 *src, _q15 *dst, uint16_t length, uint8_t shift)
-{    
+{
     /* Loop through all vector elements. */
     while (length--) {
         /* Shift src right and store to dst. */

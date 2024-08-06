@@ -50,7 +50,7 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
     msp_min_iq31_params paramsMin;              // Minimum params
     msp_cmplx_fft_iq31_params paramsCmplxFFT;   // Complex FFT params
     msp_cmplx_shift_iq31_params paramsShift;    // Complex shift params
-    
+
     /* Calculate the necessary result scale based on length. */
     preShift = -1;
     length = params->length;
@@ -58,21 +58,21 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
         preShift--;
         length >>= 1;
     }
-    
+
     /* Find maximum input to determine scaling order. */
     paramsMax.length = params->length << 1;
     status = msp_max_iq31(&paramsMax, src, &maximum, &index);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Find minimum input to determine scaling order. */
     paramsMin.length = params->length << 1;
     status = msp_min_iq31(&paramsMin, src, &minimum, &index);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Determine scaling order based on min/max. */
     postShift = 0;
     minimum = minimum < -maximum ? minimum : -maximum;
@@ -81,7 +81,7 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
         preShift++;
         postShift--;
     }
-    
+
     /* Prescale the complex fft input with complex conjugate. */
     paramsShift.length = params->length;
     paramsShift.shift = preShift;
@@ -90,18 +90,18 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Initialize complex FFT params structure. */
     paramsCmplxFFT.length = params->length;
     paramsCmplxFFT.bitReverse = params->bitReverse;
     paramsCmplxFFT.twiddleTable = params->twiddleTable;
-    
+
     /* Perform N/2 complex FFT on real source. */
     status = msp_cmplx_fft_iq31(&paramsCmplxFFT, src);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Initialize complex shift parameters with conjugate enabled. */
     paramsShift.length = params->length;
     paramsShift.shift = postShift;

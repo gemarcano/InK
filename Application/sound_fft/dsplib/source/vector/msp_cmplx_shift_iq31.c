@@ -35,7 +35,7 @@
 /*
  * Optimized helper function for shift right with complex conjugate, used for
  * inverse FFT functions.
- */    
+ */
 static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift);
 
 /*
@@ -47,7 +47,7 @@ msp_status msp_cmplx_shift_iq31(const msp_cmplx_shift_iq31_params *params, const
     uint16_t length;
     msp_shift_iq31_params shiftParams;
     msp_cmplx_conj_iq31_params conjParams;
-    
+
     /* Initialize the loop counter and shift variables. */
     length = params->length;
     shift = params->shift;
@@ -93,7 +93,7 @@ msp_status msp_cmplx_shift_iq31(const msp_cmplx_shift_iq31_params *params, const
 
 /* Shift factor lookup table. */
 extern const uint32_t msp_shift_right_factor_iq31[32];
-    
+
 static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
 {
     uint16_t cmdId;
@@ -102,7 +102,7 @@ static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31
     uint32_t leaFlags;
     msp_status status;
     MSP_LEA_MPYLONGMATRIX_PARAMS *leaParams;
-    
+
     /* Lookup the fractional shift value. */
     shiftValue = msp_shift_right_factor_iq31[shift & 0x1f];
 
@@ -127,10 +127,10 @@ static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate shift vector of length one. */
     shiftVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
     shiftVector[0] = shiftValue;
@@ -158,10 +158,10 @@ static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31
 
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
-    
+
     /* Save flags status before invoking the next command. */
     leaFlags = msp_lea_ifg;
-    
+
     /* Rerun the shift operation for imaginary components. */
     shiftVector[0] = -shiftValue;
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(&CMPLX_IMAG(dst));
@@ -174,13 +174,13 @@ static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31
     /* Free MSP_LEA_MPYLONGMATRIX_PARAMS structure and shift vector. */
     msp_lea_freeMemory(sizeof(int32_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Add flags to result. */
     leaFlags |= msp_lea_ifg;
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-    
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (leaFlags & LEACOVLIFG) {
@@ -200,9 +200,9 @@ static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31
 }
 
 #else //MSP_USE_LEA
-    
+
 static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
-{    
+{
     /* Loop through all vector elements. */
     while (length--) {
         /* Shift src right by the negated shift parameter and store to dst. */

@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,7 +28,7 @@
 
 #define RAISE_PIN
 
-//cem specific defines 
+//cem specific defines
 #define NIL 0 // like NULL, but for indexes, not real pointers
 
 #define DICT_SIZE         512
@@ -135,7 +135,7 @@ TASK(task_init_dict){
     } else {
         __SET(_v_node_count,NUM_LETTERS);
         return task_sample;
-        //printf("task_init_dict->task_sample\n");    
+        //printf("task_init_dict->task_sample\n");
     }
 }
 
@@ -143,7 +143,7 @@ TASK(task_sample){
 
 	unsigned letter_idx = __GET(_v_letter_idx);
     unsigned next_letter_idx = letter_idx + 1;
-    
+
     if (next_letter_idx == NUM_LETTERS_IN_SAMPLE)
         next_letter_idx = 0;
 
@@ -220,7 +220,7 @@ TASK(task_compress){
 }
 
 TASK(task_find_sibling){
-        
+
         int i = __GET(_v_sibling);
 
         if (i != NIL)
@@ -254,15 +254,15 @@ TASK(task_find_sibling){
 	                return task_add_insert;
 	                //printf("task_find_sibling->task_add_insert\n");
 	            }
-	            else 
+	            else
 	            {
 	                return task_add_node;
 	                //printf("task_find_sibling->task_add_node\n");
-	            }                
-            }            
+	            }
+            }
         }
         else
-        {    
+        {
             index_t starting_node_idx = (index_t) __GET(_v_letter);
 
             __SET(_v_parent_next, starting_node_idx);
@@ -272,7 +272,7 @@ TASK(task_find_sibling){
                 return task_add_insert;
                 //printf("task_find_sibling->task_add_insert\n");
             }
-            else 
+            else
             {
                 return task_add_node;
                 //printf("task_find_sibling->task_add_node\n");

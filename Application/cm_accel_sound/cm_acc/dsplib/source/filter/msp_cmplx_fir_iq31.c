@@ -43,18 +43,18 @@ msp_status msp_cmplx_fir_iq31(const msp_cmplx_fir_iq31_params *params, const _iq
     bool enableCircBuf;
     msp_status status;
     MSP_LEA_FIRLONGCOMPLEX_PARAMS *leaParams;
-  
+
     /* Save parameters to local variables. */
     tapLength = params->tapLength;
     outputLength = params->length;
     enableCircBuf = params->enableCircularBuffer;
-    
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the length is a power of two if circular buffer is enabled. */
     if (enableCircBuf && (outputLength & (outputLength-1))) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4) &
@@ -85,10 +85,10 @@ msp_status msp_cmplx_fir_iq31(const msp_cmplx_fir_iq31_params *params, const _iq
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_FIRLONGCOMPLEX_PARAMS structure. */
     leaParams = (MSP_LEA_FIRLONGCOMPLEX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_FIRLONGCOMPLEX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set MSP_LEA_FIRLONGCOMPLEX_PARAMS structure. */
     leaParams->vectorSize = outputLength;
     leaParams->coeffs = MSP_LEA_CONVERT_ADDRESS(params->coeffs);
@@ -108,13 +108,13 @@ msp_status msp_cmplx_fir_iq31(const msp_cmplx_fir_iq31_params *params, const _iq
     /* Invoke the LEACMD__FIRCOMPLEXLONG command. */
     cmdId = LEACMD__FIRCOMPLEXLONG;
 #endif //MSP_LEA_REVISION
-    
+
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
 
     /* Free MSP_LEA_FIRLONGCOMPLEX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_FIRLONGCOMPLEX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Set status flag. */
     status = MSP_SUCCESS;
 
@@ -152,12 +152,12 @@ msp_status msp_cmplx_fir_iq31(const msp_cmplx_fir_iq31_params *params, const _iq
     const _iq31 *coeffPtr;
     int64_t realRes;
     int64_t imagRes;
-  
+
     /* Save parameters to local variables. */
     tapLength = params->tapLength << 1;
     outputLength = params->length << 1;
     enableCircBuf = params->enableCircularBuffer;
-    
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the length is a power of two if circular buffer is enabled. */
     if (enableCircBuf && (outputLength & (outputLength-1))) {
@@ -224,7 +224,7 @@ msp_status msp_cmplx_fir_iq31(const msp_cmplx_fir_iq31_params *params, const _iq
                 srcPtr += 2;
                 coeffPtr-= 2;
             }
-            
+
             /* Saturate accumulators and store result. */
             *dst++ = (_iq31)__saturate(realRes, INT32_MIN, INT32_MAX);
             *dst++ = (_iq31)__saturate(imagRes, INT32_MIN, INT32_MAX);
@@ -255,7 +255,7 @@ msp_status msp_cmplx_fir_iq31(const msp_cmplx_fir_iq31_params *params, const _iq
                 srcPtr += 2;
                 coeffPtr-= 2;
             }
-            
+
             /* Saturate accumulators and store result. */
             *dst++ = (_iq31)__saturate(realRes, INT32_MIN, INT32_MAX);
             *dst++ = (_iq31)__saturate(imagRes, INT32_MIN, INT32_MAX);

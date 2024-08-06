@@ -41,7 +41,7 @@ msp_status msp_max_uq15(const msp_max_uq15_params *params, const _uq15 *src, _uq
     int16_t *output;
     msp_status status;
     MSP_LEA_MAXUNSIGNED_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -92,7 +92,7 @@ msp_status msp_max_uq15(const msp_max_uq15_params *params, const _uq15 *src, _uq
 
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
-    
+
     /* Write results. */
     *max = output[0];
     *index = output[1];
@@ -100,10 +100,10 @@ msp_status msp_max_uq15(const msp_max_uq15_params *params, const _uq15 *src, _uq
     /* Free MSP_LEA_MAXUNSIGNED_PARAMS structure and output vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MAXUNSIGNED_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -130,19 +130,19 @@ msp_status msp_max_uq15(const msp_max_uq15_params *params, const _uq15 *src, _uq
     _uq15 temp;
     _uq15 maximum;
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
-    
+
     /* Initialize the maximum value and index. */
     maximum = 0;
     i = 0;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Store vector element to local variable. */
         temp = *src++;
-        
+
         /* Compare vector element with current maximum value. */
         if (temp >= maximum) {
             /* Update maximum value and index. */
@@ -150,7 +150,7 @@ msp_status msp_max_uq15(const msp_max_uq15_params *params, const _uq15 *src, _uq
             i = length;
         }
     }
-    
+
     /* Save local maximum and index to output arguments. */
     *max = maximum;
     *index = params->length - (i + 1);

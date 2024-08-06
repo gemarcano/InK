@@ -40,16 +40,16 @@ msp_status msp_biquad_df1_q15(const msp_biquad_df1_q15_params *params, const _q1
     uint16_t length;
     msp_status status;
     MSP_LEA_IIRBQ1_PARAMS *leaParams;
-    
+
     /* Initialize local length variable. */
     length = params->length;
-    
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that length parameter is a multiple of two. */
     if (length & 1) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4) &
@@ -73,10 +73,10 @@ msp_status msp_biquad_df1_q15(const msp_biquad_df1_q15_params *params, const _q1
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_IIRBQ1_PARAMS structure. */
     leaParams = (MSP_LEA_IIRBQ1_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_IIRBQ1_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set MSP_LEA_IIR_PARAMS structure. */
     leaParams->vectorSizeBy2 = length >> 1;
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
@@ -96,13 +96,13 @@ msp_status msp_biquad_df1_q15(const msp_biquad_df1_q15_params *params, const _q1
     /* Invoke the LEACMD__IIRBQ1 command. */
     cmdId = LEACMD__IIRBQ1;
 #endif //MSP_LEA_REVISION
-    
+
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
 
     /* Free MSP_LEA_IIRBQ1_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_IIRBQ1_PARAMS)/sizeof(uint32_t));
-        
+
     /* Set status flag. */
     status = MSP_SUCCESS;
 
@@ -140,7 +140,7 @@ msp_status msp_biquad_df1_q15(const msp_biquad_df1_q15_params *params, const _q1
     x1 = params->states->x1;
     y2 = params->states->y2;
     y1 = params->states->y1;
-    
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that length parameter is a multiple of two. */
     if (length & 1) {
@@ -169,7 +169,7 @@ msp_status msp_biquad_df1_q15(const msp_biquad_df1_q15_params *params, const _q1
         y2 = y1;        y1 = RESHI;
         *dst++ = y1;
     }
-        
+
     /* Restore MPY32 control context. */
     MPY32CTL0 = ui16MPYState;
 #else
@@ -200,7 +200,7 @@ msp_status msp_biquad_df1_q15(const msp_biquad_df1_q15_params *params, const _q1
     params->states->x1 = x1;
     params->states->y2 = y2;
     params->states->y1 = y1;
-    
+
     return MSP_SUCCESS;
 }
 

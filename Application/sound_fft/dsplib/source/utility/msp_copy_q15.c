@@ -59,7 +59,7 @@ msp_status msp_copy_q15(const msp_copy_q15_params *params, const _q15 *src, _q15
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -80,10 +80,10 @@ msp_status msp_copy_q15(const msp_copy_q15_params *params, const _q15 *src, _q15
 
     /* Free MSP_LEA_ADDMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {

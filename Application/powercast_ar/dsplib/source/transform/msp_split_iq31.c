@@ -41,10 +41,10 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
     uint16_t length;
     msp_status status;
     MSP_LEA_FFTLONG_PARAMS *leaParams;
-    
+
     /* Get vector length parameter. */
     length = params->length;
-    
+
     /* Calculate log2Size parameter. */
     i = length;
     log2Size = 0;
@@ -58,7 +58,7 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
     if ((length & (length-1))) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, length))) {
         return MSP_LEA_INVALID_ADDRESS;
@@ -74,14 +74,14 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_FFTLONG_PARAMS structure. */
     leaParams = (MSP_LEA_FFTLONG_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_FFTLONG_PARAMS)/sizeof(uint32_t));
 
     /* Set MSP_LEA_FFTLONG_PARAMS structure. */
     leaParams->vectorSize = length;
     leaParams->log2Size = log2Size;
-    
+
     /* Load source arguments to LEA. */
     LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
@@ -91,10 +91,10 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
 
     /* Free MSP_LEA_FFTLONG_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_FFTLONG_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -141,10 +141,10 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
  *
  * Finally, performing substitutions to the G(k) and G(N-k) equations yields
  * the following optimized equations:
- * 
+ *
  *     G(k) = A(k) - j*B(k)
  *     G(N-k) = A*(k) - j*B*(k)
- * 
+ *
  * Reference: http://www.ti.com/lit/an/spra291/spra291.pdf
  */
 msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
@@ -161,23 +161,23 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
     int32_t *srcPtrK;           // Source pointer to X(k)
     int32_t *srcPtrNK;          // Source pointer to X(N-k)
     const int16_t *coeffPtr;    // Coefficient pointer
-    
+
     /* Save input length to local. */
     length = params->length;
-    
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the length is a power of two. */
     if ((length & (length-1))) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the provided table is the correct length. */
     if (*(uint16_t *)params->twiddleTable < length) {
         return MSP_TABLE_SIZE_ERROR;
     }
 #endif //MSP_DISABLE_DIAGNOSTICS
-    
-    /* 
+
+    /*
      * Calculate the first result bin (DC component).
      *
      *     X(N) = X(0)
@@ -186,11 +186,11 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
      */
     CMPLX_REAL(src) = (CMPLX_REAL(src) + CMPLX_IMAG(src)) << 1;
     CMPLX_IMAG(src) = 0;
-    
+
     /* Initialize Src(k) and Src(N/2-k) pointers when k=1. */
     srcPtrK = src + CMPLX_INCREMENT;
     srcPtrNK = src + length - CMPLX_INCREMENT;
-    
+
     /* Calculate coefficient table offset. */
     coeffOffset = 2;
     tableLength = *(uint16_t *)params->twiddleTable;
@@ -198,10 +198,10 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
         coeffOffset *= 2;
         length *= 2;
     }
-    
+
     /* Initialize coefficient pointer to index k=1. */
     coeffPtr = &params->twiddleTable[DSPLIB_TABLE_OFFSET] + coeffOffset;
-    
+
     /*
      * Initialize length of split operations to perform. G(k) and G(N/2-k) are
      * calculated in the same loop iteration so only half of the N/2 iterations
@@ -209,32 +209,32 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
      * separately.
      */
     length = (params->length >> 2) - 1;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
 #if defined(__MSP430_HAS_MPY32__)
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
 #endif
-    
+
     /* Loop through and perform all of the split operations. */
     while(length--) {
         /* Calculate X(k) - X*(N-k) to local temporary variables. */
         bR = CMPLX_REAL(srcPtrK) - CMPLX_REAL(srcPtrNK);
         bI = CMPLX_IMAG(srcPtrK) + CMPLX_IMAG(srcPtrNK);
-        
+
         /* B(k) = 0.5*(e^-j2*pi*k/2N)*(X(k) - X(N-k)) */
         cR = CMPLX_REAL(coeffPtr);
         cI = CMPLX_IMAG(coeffPtr);
         __q15iq31cmpy(&cR, &cI, &bR, &bI);
         bR = cR; bI = cI;
-        
+
         /*
          * Ar(k) = 0.5*(Xr(k) + Xr(N-k))
          * Ai(k) = 0.5*(Xi(k) - Xi(N-k))
          */
         aR = (CMPLX_REAL(srcPtrK) + CMPLX_REAL(srcPtrNK));
         aI = (CMPLX_IMAG(srcPtrK) - CMPLX_IMAG(srcPtrNK));
-        
+
         /*
          * Gr(k) = Ar(k) + Bi(k)
          * Gi(k) = Ai(k) - Br(k)
@@ -245,19 +245,19 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
         CMPLX_IMAG(srcPtrK) = aI - bR;
         CMPLX_REAL(srcPtrNK) = aR - bI;
         CMPLX_IMAG(srcPtrNK) = -(aI + bR);
-        
+
         /* Update pointers. */
         srcPtrK += CMPLX_INCREMENT;
         srcPtrNK -= CMPLX_INCREMENT;
         coeffPtr += coeffOffset;
     }
-    
+
     /* Restore MPY32 control context. */
 #if defined(__MSP430_HAS_MPY32__)
     MPY32CTL0 = ui16MPYState;
 #endif
-    
-    /* 
+
+    /*
      * Calculate the last result bin where k = N/2-k.
      *
      *     X(k) = X(N-k)
@@ -267,7 +267,7 @@ msp_status msp_split_iq31(const msp_split_iq31_params *params, int32_t *src)
      */
     CMPLX_REAL(srcPtrK) = CMPLX_REAL(srcPtrK) << 1;
     CMPLX_IMAG(srcPtrK) = -(CMPLX_IMAG(srcPtrK) << 1);
-    
+
     return MSP_SUCCESS;
 }
 

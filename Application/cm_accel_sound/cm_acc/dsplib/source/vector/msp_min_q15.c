@@ -41,7 +41,7 @@ msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *
     int16_t *output;
     msp_status status;
     MSP_LEA_MIN_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -97,7 +97,7 @@ msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *
 
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
-    
+
     /* Write results. */
     *min = output[0];
     *index = output[1];
@@ -105,10 +105,10 @@ msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *
     /* Free MSP_LEA_MIN_PARAMS structure and output vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MIN_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -135,7 +135,7 @@ msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *
     _q15 temp;
     _q15 minimum;
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -145,16 +145,16 @@ msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *
         return MSP_SIZE_ERROR;
     }
 #endif //MSP_DISABLE_DIAGNOSTICS
-    
+
     /* Initialize the minimum value and index. */
     minimum = INT16_MAX;
     i = 0;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Store vector element to local variable. */
         temp = *src++;
-        
+
         /* Compare vector element with current minimum value. */
         if (temp <= minimum) {
             /* Update minimum value and index. */
@@ -162,7 +162,7 @@ msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *
             i = length;
         }
     }
-    
+
     /* Save local minimum and index to output arguments. */
     *min = minimum;
     *index = params->length - (i + 1);

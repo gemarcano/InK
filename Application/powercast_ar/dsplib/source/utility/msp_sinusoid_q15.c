@@ -57,7 +57,7 @@ msp_status msp_sinusoid_q15(const msp_sinusoid_q15_params *params, _q15 *dst)
     df1Params.states = &states;
     df1Params.length = params->length;
 #endif //MSP_USE_LEA
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
@@ -76,7 +76,7 @@ msp_status msp_sinusoid_q15(const msp_sinusoid_q15_params *params, _q15 *dst)
     df1Params.states->x2 = _Q15(0.0);
     df1Params.states->y1 = -__q15mpy(params->amplitude, params->sinOmega);
     df1Params.states->y2 =  __q15mpy(df1Params.states->y1, params->cosOmega) << 1;
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     /* Restore MPY32 control context. */
     MPY32CTL0 = ui16MPYState;
@@ -84,7 +84,7 @@ msp_status msp_sinusoid_q15(const msp_sinusoid_q15_params *params, _q15 *dst)
 
     /* Call DF1 biquad to generate sinusoid */
     status = msp_biquad_df1_q15(&df1Params, dst, dst);
-    
+
 #if defined(MSP_USE_LEA)
     /* Free coefficients and states from LEA memory */
     msp_lea_freeMemory(sizeof(msp_biquad_df1_q15_coeffs)/sizeof(uint32_t));

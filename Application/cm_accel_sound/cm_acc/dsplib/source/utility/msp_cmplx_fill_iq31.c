@@ -60,10 +60,10 @@ msp_status msp_cmplx_fill_iq31(const msp_cmplx_fill_iq31_params *params, _iq31 *
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate offset vector of length one. */
     fillVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
 
@@ -102,10 +102,10 @@ msp_status msp_cmplx_fill_iq31(const msp_cmplx_fill_iq31_params *params, _iq31 *
     /* Free MSP_LEA_ADDMATRIX_PARAMS structure and offset vector. */
     msp_lea_freeMemory(sizeof(int32_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -132,7 +132,7 @@ msp_status msp_cmplx_fill_iq31(const msp_cmplx_fill_iq31_params *params, _iq31 *
 
     /* Initialize the vector length. */
     length = params->length;
-    
+
     /* Fill destination buffer. */
     while(length--) {
         *dst++ = params->realValue;

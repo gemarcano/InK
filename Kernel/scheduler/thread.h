@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "Kasım Sinan Yıldırım " 
+//
+// author = "Kasım Sinan Yıldırım "
 // maintainer = "Kasım Sinan Yıldırım "
-// email = "sinanyil81 [at] gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "sinanyil81 [at] gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -65,7 +65,7 @@ typedef struct {
     uint16_t sing_timer;// holds the time when the thread will be executed
     uint16_t pdc_timer; // holds the time for "periodic" execution of the thread
     uint16_t expr_timer; // hold the expiration time of the thread from time of completion
-    uint16_t pdc_period; // holds the current period 
+    uint16_t pdc_period; // holds the current period
 }thread_t;
 
 // allocates a double buffer for the persistent variables in FRAM

@@ -39,7 +39,7 @@ msp_status msp_neg_q15(const msp_neg_q15_params *params, const _q15 *src, _q15 *
     uint16_t length;
     msp_status status;
     MSP_LEA_MPYMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -65,7 +65,7 @@ msp_status msp_neg_q15(const msp_neg_q15_params *params, const _q15 *src, _q15 *
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MPYMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -86,10 +86,10 @@ msp_status msp_neg_q15(const msp_neg_q15_params *params, const _q15 *src, _q15 *
 
     /* Free MSP_LEA_MPYMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -113,7 +113,7 @@ msp_status msp_neg_q15(const msp_neg_q15_params *params, const _q15 *src, _q15 *
 msp_status msp_neg_q15(const msp_neg_q15_params *params, const _q15 *src, _q15 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 

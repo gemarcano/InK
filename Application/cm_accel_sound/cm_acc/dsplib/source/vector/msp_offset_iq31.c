@@ -41,7 +41,7 @@ msp_status msp_offset_iq31(const msp_offset_iq31_params *params, const _iq31 *sr
     int32_t *offsetVector;
     msp_status status;
     MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter and offset. */
     length = params->length;
     iq31Offset = params->offset;
@@ -63,10 +63,10 @@ msp_status msp_offset_iq31(const msp_offset_iq31_params *params, const _iq31 *sr
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-        
+
     /* Allocate offset vector of length one. */
     offsetVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
     offsetVector[0] = iq31Offset;
@@ -89,10 +89,10 @@ msp_status msp_offset_iq31(const msp_offset_iq31_params *params, const _iq31 *sr
     /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure and offset vector. */
     msp_lea_freeMemory(sizeof(int32_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -117,7 +117,7 @@ msp_status msp_offset_iq31(const msp_offset_iq31_params *params, const _iq31 *sr
 {
     uint16_t length;
     _iq31 iq31Offset;
-    
+
     /* Initialize the loop counter and offset. */
     length = params->length;
     iq31Offset = params->offset;

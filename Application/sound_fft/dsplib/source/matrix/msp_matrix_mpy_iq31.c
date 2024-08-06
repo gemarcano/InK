@@ -57,7 +57,7 @@ msp_status msp_matrix_mpy_iq31(const msp_matrix_mpy_iq31_params *params, const _
     if (srcACols != srcBRows) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
           MSP_LEA_VALID_ADDRESS(srcB, 4) &
@@ -80,7 +80,7 @@ msp_status msp_matrix_mpy_iq31(const msp_matrix_mpy_iq31_params *params, const _
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MACLONG_PARAMS structure. */
     leaParams = (MSP_LEA_MACLONG_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MACLONG_PARAMS)/sizeof(uint32_t));
 
@@ -108,13 +108,13 @@ msp_status msp_matrix_mpy_iq31(const msp_matrix_mpy_iq31_params *params, const _
             /* Load source arguments to LEA. */
             LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(&srcA[i]);
             LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
-    
+
             /* Invoke the command. */
             msp_lea_invokeCommand(cmdId);
-            
+
             /* Set status flag. */
             status = MSP_SUCCESS;
-                
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
             /* Check LEA interrupt flags for any errors. */
             if (msp_lea_ifg & LEACOVLIFG) {
@@ -146,7 +146,7 @@ msp_status msp_matrix_mpy_iq31(const msp_matrix_mpy_iq31_params *params, const _
     return status;
 }
 
-#else //MSP_USE_LEA    
+#else //MSP_USE_LEA
 
 /*
  * Perform matrix multiplication of two source matrices.
@@ -268,4 +268,4 @@ msp_status msp_matrix_mpy_iq31(const msp_matrix_mpy_iq31_params *params, const _
     return MSP_SUCCESS;
 }
 
-#endif //MSP_USE_LEA    
+#endif //MSP_USE_LEA

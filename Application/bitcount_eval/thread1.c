@@ -1,31 +1,31 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ink.h"
 
-//bitcount specific definitions 
+//bitcount specific definitions
 
 #define SEED 4L
 #define ITER 100
@@ -100,7 +100,7 @@ __app_reboot(){
 
 uint32_t flag = 77;
 TASK(t_init){
-    
+
 #ifdef RAISE_PIN
     full_run_started = 1;
 #endif
@@ -126,9 +126,9 @@ TASK(t_select_func){
     unsigned function;
     unsigned iteration;
 
-    #ifdef RANDOM   
-        seed = rand();   
-    #else 
+    #ifdef RANDOM
+        seed = rand();
+    #else
         seed = SEED;
     #endif
 
@@ -150,7 +150,7 @@ TASK(t_select_func){
     else if(function == 2)
     {
         __SET(function,++function);
-        return t_ntbl_bitcnt;          
+        return t_ntbl_bitcnt;
     }
     else if(function == 3)
     {
@@ -160,7 +160,7 @@ TASK(t_select_func){
     else if(function == 4)
     {
         __SET(function,++function);
-        return t_BW_btbl_bitcount;         
+        return t_BW_btbl_bitcount;
     }
     else if(function == 5)
     {
@@ -170,9 +170,9 @@ TASK(t_select_func){
     else if(function == 6)
     {
         __SET(function,++function);
-        return t_bit_shifter;          
+        return t_bit_shifter;
     }
-    else 
+    else
     {
         __SET(function,++function);
         return t_end;
@@ -181,7 +181,7 @@ TASK(t_select_func){
 }
 
 TASK(t_bit_count){
-        
+
         uint32_t seed = __GET(seed);
         unsigned n_0 = __GET(n_0);
         unsigned iteration = __GET(iteration);
@@ -194,7 +194,7 @@ TASK(t_bit_count){
         if(tmp_seed) do
             temp++;
         while (0 != (tmp_seed = tmp_seed&(tmp_seed-1)));
-        
+
         __SET(n_0, n_0 += temp);
         __SET(iteration, ++iteration);
 
@@ -203,7 +203,7 @@ TASK(t_bit_count){
         }
         else{
             return t_select_func;
-        }    
+        }
 
 }
 
@@ -222,7 +222,7 @@ TASK(t_bitcount){
     tmp_seed = ((tmp_seed & 0xF0F0F0F0L) >>  4) + (tmp_seed & 0x0F0F0F0FL);
     tmp_seed = ((tmp_seed & 0xFF00FF00L) >>  8) + (tmp_seed & 0x00FF00FFL);
     tmp_seed = ((tmp_seed & 0xFFFF0000L) >> 16) + (tmp_seed & 0x0000FFFFL);
-    
+
     __SET(n_1,n_1 += (int)tmp_seed);
     __SET(iteration,++iteration);
 
@@ -412,7 +412,7 @@ TASK(t_end){
 #ifdef RAISE_PIN
     if (full_run_started) {
         __port_on(3, 4);
-        __port_off(3, 4);        
+        __port_off(3, 4);
         full_run_started = 0;
     }
 #endif

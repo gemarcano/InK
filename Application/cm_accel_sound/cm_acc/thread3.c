@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -54,7 +54,7 @@ uint16_t is;
 _q15 sampled_input[FFT_SAMPLES];
 
 ENTRY_TASK(task1){
-  
+
   P3OUT |= BIT5;
 #ifndef EMULATE
   __disable_interrupt();
@@ -69,14 +69,14 @@ ENTRY_TASK(task1){
 	__enable_interrupt();
 
 	while(counter < FFT_SAMPLES);
-	
+
 	// disable interrupt for (only) MEM0
 	ADC12IER0 &= ~ADC12IE0;
 
 
 	// turn off the ADC to save energy
 	ADC12CTL0 &= ~ADC12ON;
-  
+
 	// restore interrupt state
 	__set_interrupt_state(is);
  	uint8_t i;
@@ -137,7 +137,7 @@ TASK(task2){
   //msp_checkStatus(status);
 
   /* Get peak frequency */
-  status = msp_max_q15(&maxParams, tb_fftd, NULL, &max_index); 
+  status = msp_max_q15(&maxParams, tb_fftd, NULL, &max_index);
 #else
 
   __delay_cycles(FFT_MIC_DURATION);
@@ -145,10 +145,10 @@ TASK(task2){
 #endif
   //__SIGNAL(THREAD1);
   P3OUT &= ~BIT5;
-  
+
   P3OUT |= BIT6;
   P3OUT &= ~BIT6;
-  
+
   P1IE |= BIT2;                              // P1.2 interrupt enabled
 
  return NULL;

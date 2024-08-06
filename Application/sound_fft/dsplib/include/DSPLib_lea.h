@@ -742,7 +742,7 @@ typedef struct {
 //
 //! \ingroup dsplib_support_lea
 //!
-//! \brief Parameter structure for LEACMD__BITREVERSECOMPLEXEVEN or 
+//! \brief Parameter structure for LEACMD__BITREVERSECOMPLEXEVEN or
 //! LEACMD__BITREVERSECOMPLEXODD commands.
 //
 //******************************************************************************
@@ -757,7 +757,7 @@ typedef struct {
 //
 //! \ingroup dsplib_support_lea
 //!
-//! \brief Parameter structure for LEACMD__BITREVERSECOMPLEXLONGEVEN or 
+//! \brief Parameter structure for LEACMD__BITREVERSECOMPLEXLONGEVEN or
 //! LEACMD__BITREVERSECOMPLEXLONGODD commands.
 //
 //******************************************************************************
@@ -1133,7 +1133,7 @@ static inline void msp_lea_invokeCommand(uint16_t cmdId)
     /* Clear interrupt flag and invoke the command. */
     msp_lea_ifg = 0;
     LEAPMCB = cmdId | LEAITFLG1;
-    
+
 #if defined(MSP_DISABLE_LPM0)
 #warning "DSPLib: LPM0 is disabled, undefine MSP_DISABLE_LPM0 to enable LPM0."
     /* Do not enter LPM0, poll interrupt flags for command completion. */

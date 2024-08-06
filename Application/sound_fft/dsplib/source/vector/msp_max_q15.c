@@ -41,7 +41,7 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
     int16_t *output;
     msp_status status;
     MSP_LEA_MAX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -50,7 +50,7 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
     if (length & 1) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
@@ -97,7 +97,7 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
 
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
-    
+
     /* Write results. */
     *max = output[0];
     *index = output[1];
@@ -105,10 +105,10 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
     /* Free MSP_LEA_MAX_PARAMS structure and output vector. */
     msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MAX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -127,7 +127,7 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
     return status;
 }
 
-#else //MSP_USE_LEA 
+#else //MSP_USE_LEA
 
 msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *max, uint16_t *index)
 {
@@ -135,7 +135,7 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
     _q15 temp;
     _q15 maximum;
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -149,12 +149,12 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
     /* Initialize the maximum value and index. */
     maximum = INT16_MIN;
     i = 0;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Store vector element to local variable. */
         temp = *src++;
-        
+
         /* Compare vector element with current maximum value. */
         if (temp >= maximum) {
             /* Update maximum value and index. */
@@ -162,7 +162,7 @@ msp_status msp_max_q15(const msp_max_q15_params *params, const _q15 *src, _q15 *
             i = length;
         }
     }
-    
+
     /* Save local maximum and index to output arguments. */
     *max = maximum;
     *index = params->length - (i + 1);

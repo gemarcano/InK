@@ -1,29 +1,29 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-//This application samples a microphone via ADC 
+//This application samples a microphone via ADC
 //ADC pins and hardware must be configured according to the used device
 //
 //
@@ -115,7 +115,7 @@ ENTRY_TASK(task1){
 
     //TODO:needed?
     __delay_cycles(100000);
-  
+
 #ifdef REAL_MIC
 	// save interrupt state and then disable interrupts
 	uint16_t is = __get_interrupt_state();
@@ -141,7 +141,7 @@ ENTRY_TASK(task1){
 
   return task2;
 }
-   
+
 TASK(task2){
 
   msp_status status;

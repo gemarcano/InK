@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -136,7 +136,7 @@ _interrupt(PORT1_VECTOR)
             }
             __SIGNAL(THREAD4);
             // __SIGNAL(THREAD4);
-            // //if the same thread is executing finish it 
+            // //if the same thread is executing finish it
             // if (__next_thread() != __get_thread(THREAD2))
             // {
             //     __SIGNAL(THREAD4);
@@ -149,6 +149,6 @@ _interrupt(PORT1_VECTOR)
         case P1IV_P1IFG7:  break;          // Vector  16:  P1.7 interrupt flag
         default: break;
     }
- 	  
+
 }
 

@@ -38,10 +38,10 @@
 msp_status msp_matrix_shift_q15(const msp_matrix_shift_q15_params *params, const _q15 *src, _q15 *dst)
 {
     msp_shift_q15_params paramsTemp;
-    
+
     /* Use real vector shift function. */
     paramsTemp.shift = params->shift;
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_shift_q15(&paramsTemp, src, dst);
 }

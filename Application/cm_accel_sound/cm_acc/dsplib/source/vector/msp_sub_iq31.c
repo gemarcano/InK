@@ -39,7 +39,7 @@ msp_status msp_sub_iq31(const msp_sub_iq31_params *params, const _iq31 *srcA, co
     uint16_t length;
     msp_status status;
     MSP_LEA_SUBLONGMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -61,7 +61,7 @@ msp_status msp_sub_iq31(const msp_sub_iq31_params *params, const _iq31 *srcA, co
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_SUBLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_SUBLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_SUBLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -82,10 +82,10 @@ msp_status msp_sub_iq31(const msp_sub_iq31_params *params, const _iq31 *srcA, co
 
     /* Free MSP_LEA_SUBLONGMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_SUBLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -109,7 +109,7 @@ msp_status msp_sub_iq31(const msp_sub_iq31_params *params, const _iq31 *srcA, co
 msp_status msp_sub_iq31(const msp_sub_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 

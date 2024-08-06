@@ -38,10 +38,10 @@
 msp_status msp_matrix_sub_iq31(const msp_matrix_sub_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
 {
     msp_sub_iq31_params paramsTemp;
-    
+
     /* Use real vector subtraction function. */
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_sub_iq31(&paramsTemp, srcA, srcB, dst);
 }
 

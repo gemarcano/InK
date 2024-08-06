@@ -38,7 +38,7 @@
 //! @{
 //!
 //! Functions for performing Discreet Fourier Transforms (DFT), commonly
-//! referred to as Fast Fourier Transforms (FFT), on MSP embedded devices. 
+//! referred to as Fast Fourier Transforms (FFT), on MSP embedded devices.
 //! Functions for both real and complex inputs, 16-bit and 32-bit data types as
 //! well as forward and inverse transforms are included.
 //!
@@ -47,7 +47,7 @@
 //! input data.
 //!
 //! \defgroup dsplib_transform_complex Complex FFT
-//! Functions for performing forward and inverse FFT of complex 16-bit and 
+//! Functions for performing forward and inverse FFT of complex 16-bit and
 //! 32-bit input data.
 //!
 //! \defgroup dsplib_transform_tables Tables
@@ -514,8 +514,8 @@ extern msp_status msp_split_iq31(const msp_split_iq31_params *params,
 //!
 //! \par Details
 //! Computes the forward discreet Fourier transform (DFT) of 16-bit real inputs.
-//! If the inputs are not already in bit reversed order the bit reversal 
-//! parameter must be set. The output is monitored for overflow and scaled by a 
+//! If the inputs are not already in bit reversed order the bit reversal
+//! parameter must be set. The output is monitored for overflow and scaled by a
 //! factor of two when an overflow risk is detected. The shift parameter
 //! contains the number of bit shifts that were applied to the output.
 //!
@@ -562,11 +562,11 @@ extern msp_status msp_fft_auto_q15(const msp_fft_q15_params *params,
 //! \brief Real forward FFT function with fixed scaling by two at each stage.
 //!
 //! \par Details
-//! Computes the forward discreet Fourier transform (DFT) of 16-bit real inputs. 
+//! Computes the forward discreet Fourier transform (DFT) of 16-bit real inputs.
 //! If the inputs are not already in bit reversed order the bit reversal
 //! parameter must be set. The output is scaled by a factor of two for each
 //! stage of the DFT.
-//! 
+//!
 //! \par
 //! This functions requires half the data storage and consumes roughly half the
 //! cycles and energy as running a complex FFT of the same length. When
@@ -583,7 +583,7 @@ extern msp_status msp_fft_auto_q15(const msp_fft_q15_params *params,
 //! data type. This can be helpful when using the IQmathLib to process the
 //! results of the FFT, such as computing the magnitude or phase angle of the
 //! complex result.
-//! 
+//!
 //! \par
 //! <center>
 //! | Length   | Input Type | Result Type |
@@ -601,7 +601,7 @@ extern msp_status msp_fft_auto_q15(const msp_fft_q15_params *params,
 //!
 //! \par
 //! The following table lists the applied scaling factor and resulting data type
-//! when the input is a 16-bit integer. 
+//! when the input is a 16-bit integer.
 //!
 //! \par
 //! <center>
@@ -642,7 +642,7 @@ extern msp_status msp_fft_fixed_q15(const msp_fft_q15_params *params,
 //! \brief Real forward FFT function without scaling.
 //!
 //! \par Details
-//! Computes the forward discreet Fourier transform (DFT) of 32-bit real inputs. 
+//! Computes the forward discreet Fourier transform (DFT) of 32-bit real inputs.
 //! If the inputs are not already in bit reversed order the bit reversal
 //! parameter must be set. The output is not scaled.
 //!
@@ -736,10 +736,10 @@ extern msp_status msp_ifft_auto_q15(const msp_fft_q15_params *params,
 //! `y = real(ifft(x))`
 //!
 //! \par Scaling
-//! This function is the direct inverse of the forward real FFT with fixed 
+//! This function is the direct inverse of the forward real FFT with fixed
 //! scaling. The following fixed point input types will all result in Q15
 //! results.
-//! 
+//!
 //! \par
 //! <center>
 //! | Length   | Input Type | Result Type |
@@ -817,7 +817,7 @@ extern msp_status msp_ifft_iq31(const msp_fft_iq31_params *params,
 //! \brief Complex forward FFT function with auto-scaling.
 //!
 //! \par Details
-//! Computes the forward discreet Fourier transform (DFT) of 16-bit complex 
+//! Computes the forward discreet Fourier transform (DFT) of 16-bit complex
 //! inputs. If the inputs are not already in bit reversed order the bit reversal
 //! parameter must be set. The output is monitored for overflow and scaled by a
 //! factor of two when an overflow risk is detected. The shift parameter contains
@@ -839,7 +839,7 @@ extern msp_status msp_ifft_iq31(const msp_fft_iq31_params *params,
 //! shared LEA memory with alignment equal to four times the data length (e.g.
 //! a 256-point complex FFT requires 1024-byte alignment). When allocating data
 //! the MSP\_CMPLX\_ALIGN\_FFT\_Q15 macro can be used to calculate correct
-//! alignment. The twiddle table pointer parameter is not used with LEA and 
+//! alignment. The twiddle table pointer parameter is not used with LEA and
 //! can be null or uninitialized.
 //!
 //! \param params Pointer to the complex FFT parameter structure.
@@ -874,7 +874,7 @@ extern msp_status msp_cmplx_fft_auto_q15(const msp_cmplx_fft_q15_params *params,
 //! or a different fixed point data type. This can be helpful when using the
 //! IQmathLib to process the results of the FFT, such as computing the magnitude
 //! or phase angle of the complex result.
-//! 
+//!
 //! \par
 //! <center>
 //! | Length   | Input Type | Result Type |
@@ -892,7 +892,7 @@ extern msp_status msp_cmplx_fft_auto_q15(const msp_cmplx_fft_q15_params *params,
 //!
 //! \par
 //! The following table lists the applied scaling factor and resulting data type
-//! when the input is a 16-bit integer. 
+//! when the input is a 16-bit integer.
 //!
 //! \par
 //! <center>
@@ -914,7 +914,7 @@ extern msp_status msp_cmplx_fft_auto_q15(const msp_cmplx_fft_q15_params *params,
 //! shared LEA memory with alignment equal to four times the data length (e.g.
 //! a 256-point complex FFT requires 1024-byte alignment). When allocating data
 //! the MSP\_CMPLX\_ALIGN\_FFT\_Q15 macro can be used to calculate correct
-//! alignment. The twiddle table pointer parameter is not used with LEA and 
+//! alignment. The twiddle table pointer parameter is not used with LEA and
 //! can be null or uninitialized.
 //!
 //! \param params Pointer to the complex FFT parameter structure.
@@ -943,10 +943,10 @@ extern msp_status msp_cmplx_fft_fixed_q15(
 //!
 //! \par LEA Support
 //! This function is supported by LEA and requires data to be placed into
-//! shared LEA memory with alignment equal to eight times the data length 
+//! shared LEA memory with alignment equal to eight times the data length
 //! (e.g. a 256-point complex FFT requires 2048-byte alignment). When allocating
 //! data the MSP\_CMPLX\_ALIGN\_FFT\_IQ31 macro can be used to calculate correct
-//! alignment. The twiddle table pointer parameter is not used with LEA and 
+//! alignment. The twiddle table pointer parameter is not used with LEA and
 //! can be null or uninitialized.
 //!
 //! \param params Pointer to the complex FFT parameter structure.
@@ -965,7 +965,7 @@ int32_t *src);
 //! \brief Complex inverse FFT function with auto-scaling.
 //!
 //! \par Details
-//! Computes the inverse discreet Fourier transform (DFT) of 16-bit complex 
+//! Computes the inverse discreet Fourier transform (DFT) of 16-bit complex
 //! inputs. If the inputs are not already in bit reversed order the bit reversal
 //! parameter must be set. The output is monitored for overflow and scaled by a
 //! factor of two when an overflow risk is detected. Automatic scaling is
@@ -980,7 +980,7 @@ int32_t *src);
 //! shared LEA memory with alignment equal to four times the data length (e.g.
 //! a 256-point complex FFT requires 1024-byte alignment). When allocating data
 //! the MSP\_CMPLX\_ALIGN\_FFT\_Q15 macro can be used to calculate correct
-//! alignment. The twiddle table pointer parameter is not used with LEA and 
+//! alignment. The twiddle table pointer parameter is not used with LEA and
 //! can be null or uninitialized.
 //!
 //! \param params Pointer to the complex FFT parameter structure.
@@ -1002,7 +1002,7 @@ extern msp_status msp_cmplx_ifft_auto_q15(
 //! \brief Complex inverse FFT function with fixed scaling by two at each stage.
 //!
 //! \par Details
-//! Computes the inverse discreet Fourier transform (DFT) of 16-bit complex 
+//! Computes the inverse discreet Fourier transform (DFT) of 16-bit complex
 //! inputs. If the inputs are not already in bit reversed order the bit reversal
 //! parameter must be set. Fixed scaling is performed such that this is the
 //! direct inverse of the forward FFT with fixed scaling.
@@ -1014,7 +1014,7 @@ extern msp_status msp_cmplx_ifft_auto_q15(
 //! This function is the direct inverse of the forward complex FFT with fixed
 //! scaling. The following fixed point input types will all result in Q15
 //! results.
-//! 
+//!
 //! \par
 //! <center>
 //! | Length   | Input Type | Result Type |
@@ -1035,7 +1035,7 @@ extern msp_status msp_cmplx_ifft_auto_q15(
 //! shared LEA memory with alignment equal to four times the data length (e.g.
 //! a 256-point complex FFT requires 1024-byte alignment). When allocating data
 //! the MSP\_CMPLX\_ALIGN\_FFT\_Q15 macro can be used to calculate correct
-//! alignment. The twiddle table pointer parameter is not used with LEA and 
+//! alignment. The twiddle table pointer parameter is not used with LEA and
 //! can be null or uninitialized.
 //!
 //! \param params Pointer to the complex FFT parameter structure.
@@ -1065,10 +1065,10 @@ extern msp_status msp_cmplx_ifft_fixed_q15(
 //!
 //! \par LEA Support
 //! This function is supported by LEA and requires data to be placed into
-//! shared LEA memory with alignment equal to eight times the data length 
+//! shared LEA memory with alignment equal to eight times the data length
 //! (e.g. a 256-point complex FFT requires 2048-byte alignment). When allocating
 //! data the MSP\_CMPLX\_ALIGN\_FFT\_IQ31 macro can be used to calculate correct
-//! alignment. The twiddle table pointer parameter is not used with LEA and 
+//! alignment. The twiddle table pointer parameter is not used with LEA and
 //! can be null or uninitialized.
 //!
 //! \param params Pointer to the complex FFT parameter structure.

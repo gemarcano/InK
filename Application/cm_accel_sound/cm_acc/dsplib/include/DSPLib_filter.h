@@ -535,8 +535,8 @@ typedef struct msp_biquad_cascade_df2_ext_q15_params {
 //! \par LEA Support
 //! This function is supported by LEA and requires data to be placed into
 //! shared LEA memory with 4-byte alignment when circular buffer is disabled or
-//! aligned to four times the FIR data length if circular buffer is enabled 
-//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a 
+//! aligned to four times the FIR data length if circular buffer is enabled
+//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a
 //! 256-byte address). When allocating data the MSP\_ALIGN\_FIR\_Q15 macro can
 //! be used to calculate the correct alignment.
 //!
@@ -570,8 +570,8 @@ extern msp_status msp_fir_q15(
 //! \par LEA Support
 //! This function is supported by LEA and requires data to be placed into
 //! shared LEA memory with 4-byte alignment when circular buffer is disabled or
-//! aligned to eight times the FIR data length if circular buffer is enabled 
-//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a 
+//! aligned to eight times the FIR data length if circular buffer is enabled
+//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a
 //! 512-byte address). When allocating data the MSP\_ALIGN\_FIR\_IQ31 macro can
 //! be used to calculate the correct alignment.
 //!
@@ -605,9 +605,9 @@ extern msp_status msp_fir_iq31(
 //! \par LEA Support
 //! This function is supported by LEA and requires data to be placed into
 //! shared LEA memory with 4-byte alignment when circular buffer is disabled or
-//! aligned to eight times the FIR data length if circular buffer is enabled 
-//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a 
-//! 512-byte address). When allocating data the MSP\_ALIGN\_CMPLX\_FIR\_Q15 
+//! aligned to eight times the FIR data length if circular buffer is enabled
+//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a
+//! 512-byte address). When allocating data the MSP\_ALIGN\_CMPLX\_FIR\_Q15
 //! macro can be used to calculate the correct alignment.
 //!
 //! \param params Pointer to the complex FIR parameter structure.
@@ -640,9 +640,9 @@ extern msp_status msp_cmplx_fir_q15(
 //! \par LEA Support
 //! This function is supported by LEA and requires data to be placed into
 //! shared LEA memory with 4-byte alignment when circular buffer is disabled or
-//! aligned to sixteen times the FIR data length if circular buffer is enabled 
-//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a 
-//! 1024-byte address). When allocating data the MSP\_ALIGN\_CMPLX\_FIR\_IQ31 
+//! aligned to sixteen times the FIR data length if circular buffer is enabled
+//! (e.g. a 64-sample FIR with 128-sample circular buffer must be aligned to a
+//! 1024-byte address). When allocating data the MSP\_ALIGN\_CMPLX\_FIR\_IQ31
 //! macro can be used to calculate the correct alignment.
 //!
 //! \param params Pointer to the complex FIR parameter structure.

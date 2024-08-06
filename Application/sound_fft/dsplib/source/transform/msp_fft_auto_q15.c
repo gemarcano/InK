@@ -42,22 +42,22 @@ msp_status msp_fft_auto_q15(const msp_fft_q15_params *params, int16_t *src, uint
     msp_status status;                          // Status of the operations
     msp_split_q15_params paramsSplit;           // Split operation params
     msp_cmplx_fft_q15_params paramsCmplxFFT;    // Complex FFT params
-    
+
     /* Initialize complex FFT params structure. */
     paramsCmplxFFT.length = params->length >> 1;
     paramsCmplxFFT.bitReverse = params->bitReverse;
     paramsCmplxFFT.twiddleTable = params->twiddleTable;
-    
+
     /* Perform N/2 complex FFT on real source without scaling. */
     status = msp_cmplx_fft_auto_q15(&paramsCmplxFFT, src, shift);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Initialize split operation params structure. */
     paramsSplit.length = params->length;
     paramsSplit.twiddleTable = params->twiddleTable;
-    
+
     /* Perform the last stage split operation to obtain N/2 complex FFT results. */
     return msp_split_q15(&paramsSplit, src);
 }

@@ -39,11 +39,11 @@
 msp_status msp_cmplx_scale_iq31(const msp_cmplx_scale_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     msp_scale_iq31_params paramsTemp;
-    
+
     /* Use real vector scale function with twice the length. */
     paramsTemp.length = params->length << 1;
     paramsTemp.scale = params->scale;
     paramsTemp.shift = params->shift;
-    
+
     return msp_scale_iq31(&paramsTemp, src, dst);
 }

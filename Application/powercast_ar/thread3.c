@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -70,7 +70,7 @@ ENTRY_TASK(t_init)
 
   // __SIGNAL(THREAD2);
 
-  // return NULL;  
+  // return NULL;
   if (__GET(sample_count) < ROUNDS)
   {
     return t_sample;
@@ -83,7 +83,7 @@ ENTRY_TASK(t_init)
 
 
 TASK(t_sample){
-  
+
   P3OUT |= BIT5;
 
   __disable_interrupt();
@@ -98,14 +98,14 @@ TASK(t_sample){
 	__enable_interrupt();
 
 	while(counter < FFT_SAMPLES);
-	
+
 	// disable interrupt for (only) MEM0
 	ADC12IER0 &= ~ADC12IE0;
 
 
 	// turn off the ADC to save energy
 	ADC12CTL0 &= ~ADC12ON;
-  
+
 	// restore interrupt state
 	__set_interrupt_state(is);
  	uint16_t i;
@@ -160,11 +160,11 @@ TASK(task2){
   //msp_checkStatus(status);
 
   /* Get peak frequency */
-  status = msp_max_q15(&maxParams, tb_fftd, NULL, &max_index); 
+  status = msp_max_q15(&maxParams, tb_fftd, NULL, &max_index);
 
   // if (max_index > START_BOUND)
   // {
-  //     //execution path 1   
+  //     //execution path 1
   // }
   // else
   // {
@@ -175,7 +175,7 @@ TASK(task2){
   __SET(power_array[__GET(sample_count)],tb_fftd[max_index]);
   __SET(sample_count,++__GET(sample_count));
   // __SIGNAL(THREAD1);
-  
+
 //  P1IE |= BIT2;                              // P1.2 interrupt enabled
   P3OUT &= ~BIT5;
 
@@ -195,12 +195,12 @@ TASK(t_consesus)
     sumPow +=(uint16_t) __GET(power_array[i]);
     sumIdx +=(uint16_t) __GET(max_array[i]);
   }
-  
+
   uint16_t avgPow;
   avgPow = (sumPow / 8);
   uint16_t avgIdx;
   avgIdx = (sumIdx / 8 );
-  
+
   if (avgPow>POWER_BOUND && avgIdx>INDEX_BOUND)
   {
     if (class_stat == 1)

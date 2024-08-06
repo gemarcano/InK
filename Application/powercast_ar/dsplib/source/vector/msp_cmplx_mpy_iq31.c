@@ -38,17 +38,17 @@
 msp_status msp_cmplx_mpy_iq31(const msp_cmplx_mpy_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
 #if defined(__MSP430_HAS_MPY32__)
     uint16_t *dstPtr = (uint16_t *)dst;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
-    
+
     /* Loop through all vector elements. */
      while (length--) {
         /* Complex multiply srcA and srcB and store to dst. */
@@ -86,7 +86,7 @@ msp_status msp_cmplx_mpy_iq31(const msp_cmplx_mpy_iq31_params *params, const _iq
         /* Complex multiply srcA and srcB and store to dst. */
         *dst++ = (((int64_t)CMPLX_REAL(srcA) * (int64_t)CMPLX_REAL(srcB)) - ((int64_t)CMPLX_IMAG(srcA) * (int64_t)CMPLX_IMAG(srcB))) >> 31;
         *dst++ = (((int64_t)CMPLX_REAL(srcA) * (int64_t)CMPLX_IMAG(srcB)) + ((int64_t)CMPLX_IMAG(srcA) * (int64_t)CMPLX_REAL(srcB))) >> 31;
-        
+
         /* Increment pointers. */
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;

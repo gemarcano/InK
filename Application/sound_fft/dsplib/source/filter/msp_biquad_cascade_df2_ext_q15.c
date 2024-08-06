@@ -39,10 +39,10 @@ msp_status msp_biquad_cascade_df2_ext_q15(const msp_biquad_cascade_df2_ext_q15_p
     const _q15 *srcPtr;
     msp_status status;
     msp_biquad_df2_ext_q15_params df2ExtParams;
-    
+
     /* Load the number of stages from the parameters. */
     stages = params->stages;
-    
+
     /* Set initial source pointer. */
     srcPtr = src;
 
@@ -52,18 +52,18 @@ msp_status msp_biquad_cascade_df2_ext_q15(const msp_biquad_cascade_df2_ext_q15_p
         df2ExtParams.length = params->length;
         df2ExtParams.coeffs = &params->coeffs[i];
         df2ExtParams.states = &params->states[i];
-    
+
         /* Invoke the msp_biquad_df2_ext_q15 function and check status flag. */
         status = msp_biquad_df2_ext_q15(&df2ExtParams, srcPtr, dst);
         if (status != MSP_SUCCESS) {
             /* Something went wrong, return the status of the operation. */
             return status;
         }
-        
+
         /* Set source pointer to destination for next stage. */
         srcPtr = dst;
     }
-    
+
     /* Return the status of the operation. */
     return status;
 }

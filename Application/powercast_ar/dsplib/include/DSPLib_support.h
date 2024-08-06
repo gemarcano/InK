@@ -40,7 +40,7 @@
 //! Definitions and abstraction for MSP devices.
 //!
 //! \defgroup dsplib_support_device Common
-//! This file provides common definitions, useful conversion macros and 
+//! This file provides common definitions, useful conversion macros and
 //! abstracted functions to support the core DSPLib functions. While not all
 //! macros and functions in this file are useful outside of DSPLib the main
 //! application can use any of them as needed.
@@ -405,7 +405,7 @@ static inline uint32_t msp_benchmarkStop(uint16_t baseAddress)
 //! \return Q15 result
 //
 //******************************************************************************
-static inline int16_t __q15mpy(int16_t a, int16_t b) 
+static inline int16_t __q15mpy(int16_t a, int16_t b)
 {
     MPYS = a;
     OP2  = b;
@@ -446,7 +446,7 @@ static inline int32_t __q15mpyl(int16_t a, int16_t b)
 //! \return Q31 result
 //
 //******************************************************************************
-static inline int32_t __q31mpy(int32_t a, int32_t b) 
+static inline int32_t __q31mpy(int32_t a, int32_t b)
 {
     uint32_t result;
     MPYS32L = a & 0xFFFF;

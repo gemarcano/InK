@@ -34,7 +34,7 @@
 
 #if defined(MSP_USE_LEA)
 
-#if defined(__TI_COMPILER_VERSION__) || (__IAR_SYSTEMS_ICC__) 
+#if defined(__TI_COMPILER_VERSION__) || (__IAR_SYSTEMS_ICC__)
 #pragma vector=LEA_VECTOR
 __interrupt void msp_lea_isr(void)
 #elif defined(__GNUC__) && (__MSP430__)

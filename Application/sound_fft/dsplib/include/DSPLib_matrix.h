@@ -579,7 +579,7 @@ extern msp_status msp_matrix_trans_iq31(const msp_matrix_trans_iq31_params *para
 //! \brief Negation of a source matrix.
 //!
 //! \par Details
-//! Element-wise Q15 multiplication by negative one with a real source matrix. 
+//! Element-wise Q15 multiplication by negative one with a real source matrix.
 //! This function supports in-place operation.
 //!
 //! \par Pseudo code
@@ -607,7 +607,7 @@ extern msp_status msp_matrix_neg_q15(const msp_matrix_neg_q15_params *params,
 //! \brief Negation of a source matrix.
 //!
 //! \par Details
-//! Element-wise IQ31 multiplication by negative one with a real source matrix. 
+//! Element-wise IQ31 multiplication by negative one with a real source matrix.
 //! This function supports in-place operation.
 //!
 //! \par Pseudo code

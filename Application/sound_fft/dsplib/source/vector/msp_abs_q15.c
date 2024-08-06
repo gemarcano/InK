@@ -38,7 +38,7 @@
 msp_status msp_abs_q15(const msp_abs_q15_params *params, const _q15 *src, _q15 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -48,7 +48,7 @@ msp_status msp_abs_q15(const msp_abs_q15_params *params, const _q15 *src, _q15 *
         return MSP_SIZE_ERROR;
     }
 #endif //MSP_DISABLE_DIAGNOSTICS
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Compute the absolute value of src and store to dst. */

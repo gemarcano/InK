@@ -49,7 +49,7 @@ msp_status msp_biquad_df2_ext_q15(const msp_biquad_df2_ext_q15_params *params, c
     if (length & 1) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4) &
@@ -101,7 +101,7 @@ msp_status msp_biquad_df2_ext_q15(const msp_biquad_df2_ext_q15_params *params, c
     /* Invoke the LEACMD__IIRBQ2EXTENDED command. */
     cmdId = LEACMD__IIRBQ2EXTENDED;
 #endif //MSP_LEA_REVISION
-    
+
     /* Invoke the command. */
     msp_lea_invokeCommand(cmdId);
 

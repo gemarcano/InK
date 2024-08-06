@@ -38,12 +38,12 @@
 msp_status msp_matrix_scale_q15(const msp_matrix_scale_q15_params *params, const _q15 *src, _q15 *dst)
 {
     msp_scale_q15_params paramsTemp;
-    
+
     /* Use real vector scale function. */
     paramsTemp.scale = params->scale;
     paramsTemp.shift = params->shift;
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_scale_q15(&paramsTemp, src, dst);
 
 }

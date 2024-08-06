@@ -44,27 +44,27 @@ msp_status msp_cmplx_ifft_fixed_q15(const msp_cmplx_fft_q15_params *params, int1
     msp_cmplx_conj_q15_params conjParams;       // Complex conjugate params
     msp_cmplx_fft_q15_params paramsCmplxFFT;    // Complex FFT params
     msp_cmplx_shift_q15_params paramsShift;     // Complex shift params
-    
+
     /* Initialize complex conjugate params structure. */
     conjParams.length = params->length;
-    
+
     /* Take the complex conjugate of the input. */
     status = msp_cmplx_conj_q15(&conjParams, src, src);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Initialize complex FFT params structure. */
     paramsCmplxFFT.length = params->length;
     paramsCmplxFFT.bitReverse = params->bitReverse;
     paramsCmplxFFT.twiddleTable = params->twiddleTable;
-    
+
     /* Perform complex FFT on real source with scaling. */
     status = msp_cmplx_fft_auto_q15(&paramsCmplxFFT, src, &resultShift);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
-    
+
     /* Initialize complex shift parameters with conjugate enabled. */
     paramsShift.length = params->length;
     paramsShift.shift = (int8_t)resultShift;

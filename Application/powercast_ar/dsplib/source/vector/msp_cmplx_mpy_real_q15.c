@@ -38,15 +38,15 @@
 msp_status msp_cmplx_mpy_real_q15(const msp_cmplx_mpy_real_q15_params *params, const _q15 *srcCmplx, const _q15 *srcReal, _q15 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Multiply srcCmplx and srcReal and store to dst. */
@@ -56,7 +56,7 @@ msp_status msp_cmplx_mpy_real_q15(const msp_cmplx_mpy_real_q15_params *params, c
         OP2  = *srcCmplx++;
         *dst++ = RESHI;
     }
-    
+
     /* Restore MPY32 control context. */
     MPY32CTL0 = ui16MPYState;
 #else //__MSP430_HAS_MPY32__

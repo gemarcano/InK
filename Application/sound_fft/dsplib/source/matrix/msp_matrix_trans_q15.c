@@ -42,9 +42,9 @@ msp_status msp_matrix_trans_q15(const msp_matrix_trans_q15_params *params, const
     uint16_t cols;
     msp_status status;
     msp_deinterleave_q15_params deinterParams;
-    
+
     /* Extract matrix parameters. */
-    rows = params->rows; 
+    rows = params->rows;
     cols = params->cols;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
@@ -57,7 +57,7 @@ msp_status msp_matrix_trans_q15(const msp_matrix_trans_q15_params *params, const
     /* Initialize deinterleave parameters. */
     deinterParams.length = rows;
     deinterParams.numChannels = cols;
-    
+
     /* Iterate through source columns and deinterleave to destination. */
     for (i = 0; i < cols; i++) {
         /* Transpose source columns to destination rows using deinterleave. */

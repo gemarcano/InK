@@ -38,9 +38,9 @@
 msp_status msp_matrix_neg_iq31(const msp_matrix_neg_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     msp_neg_iq31_params paramsTemp;
-    
+
     /* Use real vector negate function. */
     paramsTemp.length = params->rows * params->cols;
-    
+
     return msp_neg_iq31(&paramsTemp, src, dst);
 }

@@ -35,17 +35,17 @@
 msp_status msp_cmplx_mac_iq31(const msp_cmplx_mac_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *result)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     uint16_t *resultPtr = (uint16_t *)result;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
-    
+
     /* Initialize result registers. */
     RES0=0; RES1=0; RES2=0; RES3=0;
 
@@ -64,11 +64,11 @@ msp_status msp_cmplx_mac_iq31(const msp_cmplx_mac_iq31_params *params, const _iq
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;
     }
-    
+
     /* Save real result. */
     *resultPtr++ = RES2;
     *resultPtr++ = RES3;
-    
+
     /* Reset length to calculate imaginary value, reset result registers .*/
     length = params->length;
     RES3=0; RES2=0; RES1=0; RES0=0;
@@ -89,7 +89,7 @@ msp_status msp_cmplx_mac_iq31(const msp_cmplx_mac_iq31_params *params, const _iq
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;
     }
-    
+
     /* Save imaginary result. */
     *resultPtr++ = RES2;
     *resultPtr++ = RES3;
@@ -99,7 +99,7 @@ msp_status msp_cmplx_mac_iq31(const msp_cmplx_mac_iq31_params *params, const _iq
 #else //__MSP430_HAS_MPY32__
     int64_t resultReal = 0;
     int64_t resultImag = 0;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Complex multiply srcA and srcB and accumulate to the result. */
@@ -107,12 +107,12 @@ msp_status msp_cmplx_mac_iq31(const msp_cmplx_mac_iq31_params *params, const _iq
         resultReal -= ((int64_t)CMPLX_IMAG(srcA) * (int64_t)CMPLX_IMAG(srcB));
         resultImag += ((int64_t)CMPLX_REAL(srcA) * (int64_t)CMPLX_IMAG(srcB));
         resultImag += ((int64_t)CMPLX_IMAG(srcA) * (int64_t)CMPLX_REAL(srcB));
-        
+
         /* Increment pointers. */
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;
     }
-    
+
     /* Scale result, saturate and save to result array. */
     CMPLX_REAL(result) = (_iq31)__saturate((resultReal >> 31), INT32_MIN, INT32_MAX);
     CMPLX_IMAG(result) = (_iq31)__saturate((resultImag >> 31), INT32_MIN, INT32_MAX);

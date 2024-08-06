@@ -39,7 +39,7 @@ msp_status msp_mac_q15(const msp_mac_q15_params *params, const _q15 *srcA, const
     uint16_t length;
     msp_status status;
     MSP_LEA_MAC_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -66,7 +66,7 @@ msp_status msp_mac_q15(const msp_mac_q15_params *params, const _q15 *srcA, const
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MAC_PARAMS structure. */
     leaParams = (MSP_LEA_MAC_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MAC_PARAMS)/sizeof(uint32_t));
 
@@ -84,10 +84,10 @@ msp_status msp_mac_q15(const msp_mac_q15_params *params, const _q15 *srcA, const
 
     /* Free MSP_LEA_MAC_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_MAC_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -106,12 +106,12 @@ msp_status msp_mac_q15(const msp_mac_q15_params *params, const _q15 *srcA, const
     return status;
 }
 
-#else //MSP_USE_LEA    
+#else //MSP_USE_LEA
 
 msp_status msp_mac_q15(const msp_mac_q15_params *params, const _q15 *srcA, const _q15 *srcB, _iq31 *result)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -124,40 +124,40 @@ msp_status msp_mac_q15(const msp_mac_q15_params *params, const _q15 *srcA, const
 
 #if defined(__MSP430_HAS_MPY32__)
     uint16_t *resultPtr = (uint16_t *)result;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN | MPYSAT;
-    
+
     /* Reset multiplier context. */
     MPY32CTL0 &= ~MPYC;
     RESHI = 0; RESLO = 0;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Multiply and accumulate srcA and srcB. */
         MACS = *srcA++;
         OP2  = *srcB++;
     }
-    
+
     /* Store result. */
     *resultPtr++ = RESLO;
     *resultPtr++ = RESHI;
-    
+
     /* Restore MPY32 control context. */
     MPY32CTL0 = ui16MPYState;
-    
+
 #else //__MSP430_HAS_MPY32__
 
     /* Initialize the result. */
     *result = 0;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Multiply srcA and srcB and accumulate to the result. */
         *result += (int32_t)*srcA++ * (int32_t)*srcB++;
     }
-    
+
     /* Scale result by 2. */
     *result <<= 1;
 #endif //__MSP430_HAS_MPY32__

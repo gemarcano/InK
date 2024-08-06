@@ -48,7 +48,7 @@ msp_status msp_add_q15(const msp_add_q15_params *params, const _q15 *srcA, const
     if (length & 1) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
           MSP_LEA_VALID_ADDRESS(srcB, 4) &
@@ -66,7 +66,7 @@ msp_status msp_add_q15(const msp_add_q15_params *params, const _q15 *srcA, const
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -87,10 +87,10 @@ msp_status msp_add_q15(const msp_add_q15_params *params, const _q15 *srcA, const
 
     /* Free MSP_LEA_ADDMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -124,7 +124,7 @@ msp_status msp_add_q15(const msp_add_q15_params *params, const _q15 *srcA, const
         return MSP_SIZE_ERROR;
     }
 #endif //MSP_DISABLE_DIAGNOSTICS
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Add srcA and srcB with saturation and store result. */

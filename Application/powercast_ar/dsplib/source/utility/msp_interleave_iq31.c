@@ -52,7 +52,7 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
     if (channel > numChannels) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4))) {
@@ -69,7 +69,7 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -90,10 +90,10 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
 
     /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {

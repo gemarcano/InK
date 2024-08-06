@@ -53,7 +53,7 @@ msp_status msp_interleave_q15(const msp_interleave_q15_params *params, const _q1
     if (channel > numChannels) {
         return MSP_SIZE_ERROR;
     }
-    
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4))) {
@@ -75,7 +75,7 @@ msp_status msp_interleave_q15(const msp_interleave_q15_params *params, const _q1
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_INTERLEAVE_PARAMS structure. */
     leaParams = (MSP_LEA_INTERLEAVE_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_INTERLEAVE_PARAMS)/sizeof(uint32_t));
 

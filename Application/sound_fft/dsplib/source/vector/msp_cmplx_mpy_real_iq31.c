@@ -40,7 +40,7 @@ msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params,
     uint16_t length;
     msp_status status;
     MSP_LEA_MPYLONGMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -67,7 +67,7 @@ msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params,
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -107,10 +107,10 @@ msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params,
 
     /* Free MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -130,21 +130,21 @@ msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params,
 }
 
 #else //MSP_USE_LEA
-    
+
 msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params, const _iq31 *srcCmplx, const _iq31 *srcReal, _iq31 *dst)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
 #if defined(__MSP430_HAS_MPY32__)
     uint16_t *dstPtr = (uint16_t *)dst;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
         /* Multiply CMPLX_REAL(srcA) and CMPLX_REAL(srcB) */
@@ -160,12 +160,12 @@ msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params,
         OP2H = (uint16_t)(CMPLX_IMAG(srcCmplx) >> 16);
         *dstPtr++ = RES2;
         *dstPtr++ = RES3;
-        
+
         /* Increment pointers. */
         srcReal++;
         srcCmplx += CMPLX_INCREMENT;
     }
-    
+
     /* Restore MPY32 control context. */
     MPY32CTL0 = ui16MPYState;
 #else //__MSP430_HAS_MPY32__

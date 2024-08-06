@@ -209,7 +209,7 @@ msp_status msp_cmplx_fir_q15(const msp_cmplx_fir_q15_params *params, const _q15 
 
             /* Store real result. */
             *dst++ = (_q15)RESHI;
-            
+
             /* Reset data pointers and loop counters. */
             coeffPtr = &params->coeffs[tapLength - 2];
             srcPtr = (const _q15 *)__circular_increment((const void *)src, i*sizeof(_q15), mask);

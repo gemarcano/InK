@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas " 
+//
+// author = "dpatoukas "
 // maintainer = "dpatoukas "
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you ca	n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -50,7 +50,7 @@
 // Number of classifications to complete in one experiment
 #define SAMPLES_TO_COLLECT 512
 
-typedef struct 
+typedef struct
 {
     int16_t x,y,z;
 
@@ -136,19 +136,19 @@ void thread2_init(){
 
 
 ENTRY_TASK(task1){
-  
+
   P3OUT |= BIT0;
 #ifndef EMULATE
   setup_mcu();
 
   i2c_init();
-  
+
   i2c_write(ADXL_345 , ADXL_CONF_REG , 0x00);
   i2c_write(ADXL_345, ADXL_CONF_REG, 0x10);
   i2c_write(ADXL_345, ADXL_CONF_REG, 0x08);
 
-    
-  //get samples 
+
+  //get samples
   uint8_t collected = 0;
   uint16_t z;
   while(N_SAMPLES-collected){
@@ -161,7 +161,7 @@ ENTRY_TASK(task1){
   __delay_cycles(SAMPLE_ACC_DURATION);
 #endif
   P3OUT &= ~BIT0;
- 
+
   return task2;
 }
 
@@ -201,25 +201,25 @@ TASK(task2){
   status = msp_abs_q15(&absParams, sampled_input_tmp, sampled_input_tmp);
 
   /* Get peak frequency */
-  status = msp_max_q15(&maxParams, sampled_input_tmp, NULL, &max_index); 
+  status = msp_max_q15(&maxParams, sampled_input_tmp, NULL, &max_index);
 #else
 
   __delay_cycles(FFT_ACC_DURATION);
 
-#endif  
+#endif
 
   P3OUT &= ~BIT0;
 
-  //Initialize the AR-app 
-  //AR test app is used here for an estimation 
-  //of a high computation application 
+  //Initialize the AR-app
+  //AR test app is used here for an estimation
+  //of a high computation application
   return task_init;
 
 }
 
 //Dummy data sampling
 void ACCEL_singleSample_(threeAxis_t_8* result){
-   
+
   // P4OUT |= BIT3;
 #ifndef EMULATE
   i2c_init();
@@ -254,7 +254,7 @@ TASK(task_init)
 {
 
   P3OUT |= BIT0;
-    
+
   //uint32_t tmp = __get_time();
 #ifdef EXPRIRATION_TIME
   set_expire_timer(THREAD2,EXPRIRATION_TIME);
@@ -262,14 +262,14 @@ TASK(task_init)
   P2OUT &= ~BIT6;
 #endif
 
-  
+
   __SET(pinCont, 1);
   __SET(_v_pinState , MODE_IDLE);
   __SET( _v_count , 0);
   __SET( _v_seed , 1);
-  
+
   P3OUT &= ~BIT0;
-  
+
   return task_selectMode;
 }
 
@@ -283,28 +283,28 @@ TASK(task_selectMode)
   unsigned count = __GET(_v_count);
   class_t  lc_class = __GET(_v_class);
   run_mode_t lc_mode = __GET(_v_mode);
-  
+
   uint16_t pin_state=1;
 
   ++count;
-  
+
   if(count >= 3)  pin_state=2;
   if(count >= 5)  pin_state=0;
-  
+
   __SET(_v_count,count);
-  
+
   // Don't re-launch training after finishing training
-  if ((pin_state == MODE_TRAIN_STATIONARY || pin_state == MODE_TRAIN_MOVING) 
+  if ((pin_state == MODE_TRAIN_STATIONARY || pin_state == MODE_TRAIN_MOVING)
       && pin_state == __GET(_v_pinState))
   {
     pin_state = MODE_IDLE;
-  } 
-  else 
+  }
+  else
   {
     __SET(_v_pinState , pin_state);
   }
 
-  
+
   switch(pin_state) {
     case MODE_TRAIN_STATIONARY:
         __SET(_v_discardedSamplesCount , 0);
@@ -318,7 +318,7 @@ TASK(task_selectMode)
         __SET(_v_discardedSamplesCount , 0);
         __SET(_v_mode , MODE_TRAIN_MOVING);
         __SET(_v_class , CLASS_MOVING);
-        __SET(_v_samplesInWindow , 0);          
+        __SET(_v_samplesInWindow , 0);
       P3OUT &= ~BIT0;
         return task_warmup;
 
@@ -336,12 +336,12 @@ TASK(task_selectMode)
 TASK(task_warmup)
 {
   P3OUT |= BIT0;
-  
+
   unsigned discardedSamplesCount = __GET(_v_discardedSamplesCount);
   unsigned trainingSetSize= __GET(_v_trainingSetSize);
-      
+
     threeAxis_t_8 sample;
-    
+
 
     if (discardedSamplesCount < NUM_WARMUP_SAMPLES) {
 
@@ -362,9 +362,9 @@ TASK(task_sample)
   P3OUT |= BIT0;
 
     int8_t ios_i;
-    
+
   unsigned samplesInWindow = __GET(_v_samplesInWindow);
-    
+
 
       accelReading sample;
       ACCEL_singleSample_(&sample);
@@ -390,7 +390,7 @@ TASK(task_transform)
   P3OUT |= BIT0;
 
   int8_t ios_i;
-    
+
   unsigned samplesInWindow = __GET(_v_samplesInWindow);
 
 
@@ -400,7 +400,7 @@ TASK(task_transform)
   {
     window[ios_i] = __GET(_v_window[ios_i]);
   }
-      
+
 
     unsigned i;
 
@@ -420,16 +420,16 @@ TASK(task_transform)
           }
       }
     P3OUT &= ~BIT0;
-    return task_featurize;      
+    return task_featurize;
 
 }
 
 TASK(task_featurize)
 {
   P3OUT |= BIT0;
-  
+
     int8_t ios_i;
-    
+
     run_mode_t mode = __GET(_v_mode);
     features_t features = __GET(_v_features);
 
@@ -440,7 +440,7 @@ TASK(task_featurize)
   {
     window[ios_i] = __GET(_v_window[ios_i]);
   }
-    
+
 
     accelReading mean, stddev;
     mean.x = mean.y = mean.z = 0;
@@ -454,7 +454,7 @@ TASK(task_featurize)
         mean.y += window[i].y;
         mean.z += window[i].z;
     }
-    
+
     mean.x >>= 2;
     mean.y >>= 2;
     mean.z >>= 2;
@@ -499,7 +499,7 @@ TASK(task_classify)
   P3OUT |= BIT0;
 
     int8_t ios_i;
-    
+
     class_t lc_class = __GET(_v_class);
     features_t features = __GET(_v_features);
 
@@ -516,14 +516,14 @@ TASK(task_classify)
     {
       model_stationary[ios_i] =
                 __GET(_v_model_stationary[ios_i]);
-    }    
+    }
 
     features_t model_moving[MODEL_SIZE];
     for (ios_i = 0; ios_i < MODEL_SIZE; ios_i++)
     {
         model_moving[ios_i] =
                 __GET(_v_model_moving[ios_i]);
-    }    
+    }
     int move_less_error = 0;
     int stat_less_error = 0;
     int i;
@@ -537,11 +537,11 @@ TASK(task_classify)
         long int stat_mean_err = ((model_stationary[i].meanmag) > meanmag)?((model_stationary[i].meanmag) - meanmag) : (meanmag - model_stationary[i].meanmag);
 
         long int stat_sd_err = ((model_stationary[i].stddevmag) > stddevmag)?((model_stationary[i].stddevmag) - stddevmag) : ((stddevmag - model_stationary[i].stddevmag));
-    
+
         long int move_mean_err = ((model_moving[i].meanmag) > meanmag) ? ((model_moving[i].meanmag) - meanmag) : (meanmag - model_moving[i].meanmag);
 
         long int move_sd_err = ((model_moving[i].stddevmag) > stddevmag) ? ((model_moving[i].stddevmag) - stddevmag) : ((stddevmag - model_moving[i].stddevmag));
-        
+
         if (move_mean_err < stat_mean_err) {
             move_less_error++;
         } else {
@@ -567,9 +567,9 @@ TASK(task_stats)
 {
   P3OUT |= BIT0;
 
-  unsigned totalCount = __GET(_v_totalCount);    
+  unsigned totalCount = __GET(_v_totalCount);
   unsigned movingCount = __GET(_v_movingCount);
-  unsigned stationaryCount = __GET(_v_stationaryCount);        
+  unsigned stationaryCount = __GET(_v_stationaryCount);
     class_t lc_class = __GET(_v_class);
 
     ++totalCount;
@@ -606,7 +606,7 @@ TASK(task_stats)
 }
 
 
-TASK(task_idle) 
+TASK(task_idle)
 {
   P3OUT |= BIT0;
 
@@ -631,7 +631,7 @@ TASK(task_idle)
 }
 
 TASK(task_resetStats)
-{ 
+{
     P3OUT |= BIT0;
       __SET(_v_movingCount , 0);
       __SET(_v_stationaryCount , 0);
@@ -649,25 +649,25 @@ TASK(task_train)
   P3OUT |= BIT0;
 
     int8_t ios_i;
-    
+
   unsigned trainingSetSize = __GET(_v_trainingSetSize);
     class_t lc_class= __GET(_v_class);
     features_t features = __GET(_v_features);
     features_t model_moving[MODEL_SIZE],model_stationary[MODEL_SIZE];
-    
+
     for (ios_i = 0; ios_i < MODEL_SIZE; ios_i++)
     {
       model_stationary[ios_i] =
                 __GET(_v_model_stationary[ios_i]);
-    }    
+    }
 
 
     for (ios_i = 0; ios_i < MODEL_SIZE; ios_i++)
     {
         model_moving[ios_i] =
                 __GET(_v_model_moving[ios_i]);
-    }    
-    
+    }
+
       switch (lc_class) {
           case CLASS_STATIONARY:
               __SET(_v_model_stationary[trainingSetSize].meanmag , features.meanmag);

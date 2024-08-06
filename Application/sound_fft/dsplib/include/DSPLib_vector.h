@@ -855,7 +855,7 @@ extern msp_status msp_mac_iq31(const msp_mac_iq31_params *params,
 //! \brief Negation of a source vector.
 //!
 //! \par Details
-//! Element-wise Q15 multiplication by negative one with a real source vector. 
+//! Element-wise Q15 multiplication by negative one with a real source vector.
 //! This function supports in-place operation.
 //!
 //! \par Pseudo code
@@ -883,7 +883,7 @@ extern msp_status msp_neg_q15(const msp_neg_q15_params *params,
 //! \brief Negation of a source vector.
 //!
 //! \par Details
-//! Element-wise IQ31 multiplication by negative one with a real source vector. 
+//! Element-wise IQ31 multiplication by negative one with a real source vector.
 //! This function supports in-place operation.
 //!
 //! \par Pseudo code
@@ -1133,7 +1133,7 @@ extern msp_status msp_shift_iq31(const msp_shift_iq31_params *params,
 //! \brief Signed maximum of a source vector.
 //!
 //! \par Details
-//! This function returns the 16-bit signed maximum value and corresponding 
+//! This function returns the 16-bit signed maximum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1163,7 +1163,7 @@ extern msp_status msp_max_q15(const msp_max_q15_params *params,
 //! \brief Signed maximum of a source vector.
 //!
 //! \par Details
-//! This function returns the 32-bit signed maximum value and corresponding 
+//! This function returns the 32-bit signed maximum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1193,7 +1193,7 @@ extern msp_status msp_max_iq31(const msp_max_iq31_params *params,
 //! \brief Unsigned maximum of a source vector.
 //!
 //! \par Details
-//! This function returns the 16-bit unsigned maximum value and corresponding 
+//! This function returns the 16-bit unsigned maximum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1223,7 +1223,7 @@ extern msp_status msp_max_uq15(const msp_max_uq15_params *params,
 //! \brief Unsigned maximum of a source vector.
 //!
 //! \par Details
-//! This function returns the 32-bit unsigned maximum value and corresponding 
+//! This function returns the 32-bit unsigned maximum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1253,7 +1253,7 @@ extern msp_status msp_max_uq31(const msp_max_uq31_params *params,
 //! \brief Signed minimum of a source vector.
 //!
 //! \par Details
-//! This function returns the 16-bit signed minimum value and corresponding 
+//! This function returns the 16-bit signed minimum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1283,7 +1283,7 @@ extern msp_status msp_min_q15(const msp_min_q15_params *params,
 //! \brief Signed minimum of a source vector.
 //!
 //! \par Details
-//! This function returns the 32-bit signed minimum value and corresponding 
+//! This function returns the 32-bit signed minimum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1313,7 +1313,7 @@ extern msp_status msp_min_iq31(const msp_min_iq31_params *params,
 //! \brief Unsigned minimum of a source vector.
 //!
 //! \par Details
-//! This function returns the 16-bit unsigned minimum value and corresponding 
+//! This function returns the 16-bit unsigned minimum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1343,7 +1343,7 @@ extern msp_status msp_min_uq15(const msp_min_uq15_params *params,
 //! \brief Unsigned minimum of a source vector.
 //!
 //! \par Details
-//! This function returns the 32-bit unsigned minimum value and corresponding 
+//! This function returns the 32-bit unsigned minimum value and corresponding
 //! index of a single source vector.
 //!
 //! \par Pseudo code
@@ -1553,8 +1553,8 @@ extern msp_status msp_cmplx_mpy_iq31(const msp_cmplx_mpy_iq31_params *params,
 //!
 //! \par Details
 //! Element-wise Q15 multiply of a complex vector by real vector without
-//! saturation. The length of complex and real vectors should be equal, that is 
-//! the complex source vector contains twice the allocated bytes for data 
+//! saturation. The length of complex and real vectors should be equal, that is
+//! the complex source vector contains twice the allocated bytes for data
 //! storage. This function supports in-place operations.
 //!
 //! \par Pseudo code
@@ -1585,8 +1585,8 @@ extern msp_status msp_cmplx_mpy_real_q15(
 //!
 //! \par Details
 //! Element-wise IQ31 multiply of a complex vector by real vector without
-//! saturation. The length of complex and real vectors should be equal, that is 
-//! the complex source vector contains twice the allocated bytes for data 
+//! saturation. The length of complex and real vectors should be equal, that is
+//! the complex source vector contains twice the allocated bytes for data
 //! storage. This function supports in-place operations.
 //!
 //! \par Pseudo code
@@ -1678,7 +1678,7 @@ extern msp_status msp_cmplx_mac_iq31(const msp_cmplx_mac_iq31_params *params,
 //! \brief Conjugation of a source vector.
 //!
 //! \par Details
-//! Conjugation of each element in a complex vector. This function supports 
+//! Conjugation of each element in a complex vector. This function supports
 //! in-place operations.
 //!
 //! \par Pseudo code
@@ -1705,7 +1705,7 @@ extern msp_status msp_cmplx_conj_q15(const msp_cmplx_conj_q15_params *params,
 //! \brief Conjugation of a source vector.
 //!
 //! \par Details
-//! Conjugation of each element in a complex vector. This function supports 
+//! Conjugation of each element in a complex vector. This function supports
 //! in-place operations.
 //!
 //! \par Pseudo code
@@ -1734,7 +1734,7 @@ extern msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params,
 //!
 //! \par Details
 //! Element-wise scaling of both imaginary and real values of a complex vector.
-//! Source data is multiplied by a IQ31 constant and then shifted left. This 
+//! Source data is multiplied by a IQ31 constant and then shifted left. This
 //! function supports in-place operation.
 //!
 //! \par Pseudo code
@@ -1762,7 +1762,7 @@ extern msp_status msp_cmplx_scale_q15(const msp_cmplx_scale_q15_params *params,
 //!
 //! \par Details
 //! Element-wise scaling of both imaginary and real values of a complex vector.
-//! Source data is multiplied by a IQ31 constant and then shifted left. This 
+//! Source data is multiplied by a IQ31 constant and then shifted left. This
 //! function supports in-place operation.
 //!
 //! \par Pseudo code
@@ -1789,7 +1789,7 @@ extern msp_status msp_cmplx_scale_iq31(const msp_cmplx_scale_iq31_params *params
 //! \brief Bitwise shift of a complex source vector.
 //!
 //! \par Details
-//! Element-wise bitwise shift of both imaginary and real elements of a complex 
+//! Element-wise bitwise shift of both imaginary and real elements of a complex
 //! vector to the left or right by a signed integer value. This function does
 //! not saturate and supports in-place operation.
 //!
@@ -1818,7 +1818,7 @@ extern msp_status msp_cmplx_shift_q15(const msp_cmplx_shift_q15_params *params,
 //! \brief Bitwise shift of a complex source vector.
 //!
 //! \par Details
-//! Element-wise bitwise shift of both imaginary and real elements of a complex 
+//! Element-wise bitwise shift of both imaginary and real elements of a complex
 //! vector to the left or right by a signed int. This function does not saturate
 //! and supports in-place operation.
 //!

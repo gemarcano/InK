@@ -42,15 +42,15 @@ msp_status msp_matrix_trans_iq31(const msp_matrix_trans_iq31_params *params, con
     uint16_t cols;
     msp_status status;
     msp_deinterleave_iq31_params deinterParams;
-    
+
     /* Extract matrix parameters. */
-    rows = params->rows; 
+    rows = params->rows;
     cols = params->cols;
 
     /* Initialize deinterleave parameters. */
     deinterParams.length = rows;
     deinterParams.numChannels = cols;
-    
+
     /* Iterate through source columns and deinterleave to destination. */
     for (i = 0; i < cols; i++) {
         /* Transpose source columns to destination rows using deinterleave. */

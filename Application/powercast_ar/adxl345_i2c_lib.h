@@ -2,7 +2,7 @@
 #ifndef EUSCI_B0_I2C_H_
 #define EUSCI_B0_I2C_H_
 
-#define NUM_BYTES_TX 2  
+#define NUM_BYTES_TX 2
 #define NUM_BYTES_RX 6
 #define ADXL_345     0x53
 #define ADXL_CONF_REG 0x2d

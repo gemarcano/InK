@@ -39,7 +39,7 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
     uint16_t length;
     msp_status status;
     MSP_LEA_MACCOMPLEXMATRIX_PARAMS *leaParams;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
@@ -61,7 +61,7 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
+
     /* Allocate MSP_LEA_MACCOMPLEXMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MACCOMPLEXMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MACCOMPLEXMATRIX_PARAMS)/sizeof(uint32_t));
 
@@ -81,10 +81,10 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
 
     /* Free MSP_LEA_MACCOMPLEXMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_MACCOMPLEXMATRIX_PARAMS)/sizeof(uint32_t));
-    
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -104,25 +104,25 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
 }
 
 #else //MSP_USE_LEA
-    
+
 msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 *srcA, const _q15 *srcB, _iq31 *result)
 {
     uint16_t length;
-    
+
     /* Initialize the loop counter with the vector length. */
     length = params->length;
 
     /* Initialize the result. */
     CMPLX_REAL(result) = 0;
     CMPLX_IMAG(result) = 0;
-    
+
 #if defined(__MSP430_HAS_MPY32__)
     uint16_t *resultPtr = (uint16_t *)result;
-    
+
     /* If MPY32 is available save control context and set to fractional mode. */
     uint16_t ui16MPYState = MPY32CTL0;
     MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
-    
+
     /* Initialize result registers. */
     MPY32CTL0 &= ~MPYC;
     RESLO = 0; RESHI = 0;
@@ -138,11 +138,11 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;
     }
-    
+
     /* Save real result. */
     *resultPtr++ = RESLO;
     *resultPtr++ = RESHI;
-    
+
     /* Reset length to calculate imaginary value, reset result registers */
     length = params->length;
     MPY32CTL0 &= ~MPYC;
@@ -160,7 +160,7 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;
     }
-    
+
     /* Save imaginary result. */
     *resultPtr++ = RESLO;
     *resultPtr++ = RESHI;
@@ -173,12 +173,12 @@ msp_status msp_cmplx_mac_q15(const msp_cmplx_mac_q15_params *params, const _q15 
         /* Complex multiply srcA and srcB and accumulate to the result. */
         CMPLX_REAL(result) += ((int32_t)CMPLX_REAL(srcA) * (int32_t)CMPLX_REAL(srcB)) - ((int32_t)CMPLX_IMAG(srcA) * (int32_t)CMPLX_IMAG(srcB));
         CMPLX_IMAG(result) += ((int32_t)CMPLX_REAL(srcA) * (int32_t)CMPLX_IMAG(srcB)) + ((int32_t)CMPLX_IMAG(srcA) * (int32_t)CMPLX_REAL(srcB));
-        
+
         /* Increment pointers. */
         srcA += CMPLX_INCREMENT;
         srcB += CMPLX_INCREMENT;
     }
-    
+
     /* Scale result by 2. */
     CMPLX_REAL(result) <<= 1;
     CMPLX_IMAG(result) <<= 1;

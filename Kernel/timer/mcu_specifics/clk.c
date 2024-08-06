@@ -1,25 +1,25 @@
 // This file is part of InK.
-// 
-// author = "dpatoukas" 
+//
+// author = "dpatoukas"
 // maintainer = "dpatoukas"
-// email = "dpatoukas@gmail.com" 
-//  
-// copyright = "Copyright 2018 Delft University of Technology" 
-// license = "LGPL" 
-// version = "3.0" 
+// email = "dpatoukas@gmail.com"
+//
+// copyright = "Copyright 2018 Delft University of Technology"
+// license = "LGPL"
+// version = "3.0"
 // status = "Production"
 //
-// 
+//
 // InK is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.//clk.c
 
@@ -29,11 +29,11 @@
 
 __nv uint32_t current_ticks;
 
-//RTC protocol helper infrastructure 
+//RTC protocol helper infrastructure
 //**************************************************//
 
 //in case of no rtc a timer through UART can be deployed
-//for developing or debugging 
+//for developing or debugging
 #ifdef UART_TIME
 static const uint8_t flag_start = UART_TIME;
 
@@ -266,7 +266,7 @@ uint32_t __get_rtc_time()
     ptr = &buff;
 
     tx_data(flag_start);
-    
+
     __enable_interrupt();
 
     while(rx_queue.count < 4)
@@ -326,7 +326,7 @@ void __attribute__ ((interrupt(EUSCI_A3_VECTOR))) USCI_A3_ISR (void)
 * start the __get_time interface
 */
 void __get_time_init()
-{   
+{
     //configure rtc interface
     __setup_rtc();
 

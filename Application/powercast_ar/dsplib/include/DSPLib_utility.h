@@ -265,10 +265,10 @@ typedef struct msp_sinusoid_q15_params {
     uint16_t length;
     //! Amplitude of the generated sinusoid.
     _q15 amplitude;
-    //! Q15 constant equal to cos(2*pi*frequency/fs) where fs is the sampling 
-    //! frequency and freq is the desired sinusoid frequency. For example a 200 
-    //! Hz sinusoid with sampling frequency of 8192 would have a cosOmega 
-    //! constant equal to cos(2*pi*200/8192) = _Q15(0.988258) or 0x7E7F in 
+    //! Q15 constant equal to cos(2*pi*frequency/fs) where fs is the sampling
+    //! frequency and freq is the desired sinusoid frequency. For example a 200
+    //! Hz sinusoid with sampling frequency of 8192 would have a cosOmega
+    //! constant equal to cos(2*pi*200/8192) = _Q15(0.988258) or 0x7E7F in
     //! hexadecimal.
     _q15 cosOmega;
     //! Q15 constant equal to sin(2*pi*frequency/fs) where fs is the sampling
@@ -524,7 +524,7 @@ extern msp_status msp_cmplx_fill_iq31(const msp_cmplx_fill_iq31_params *params,
 //!
 //! \par Details
 //! A single Q15 vector is inserted into multiple interleaved vectors. For
-//! example, a interleave operation to insert a source vector x[] into channel 
+//! example, a interleave operation to insert a source vector x[] into channel
 //! one of a four channel destination vector y[] will yield the following data
 //! result:
 //!
@@ -553,7 +553,7 @@ extern msp_status msp_interleave_q15(const msp_interleave_q15_params *params,
 //!
 //! \par Details
 //! A single IQ31 vector is inserted into multiple interleaved vectors. For
-//! example, a interleave operation to insert a source vector x[] into channel 
+//! example, a interleave operation to insert a source vector x[] into channel
 //! one of a four channel destination vector y[] will yield the following data
 //! result:
 //!
@@ -636,7 +636,7 @@ extern msp_status msp_deinterleave_iq31(
 //
 //! \ingroup dsplib_utility_api
 //!
-//! \brief Generate a sinusoid with specified amplitude and frequency. 
+//! \brief Generate a sinusoid with specified amplitude and frequency.
 //!
 //! \par Details
 //! Generate a sinusoid waveform with configured amplitude and frequency

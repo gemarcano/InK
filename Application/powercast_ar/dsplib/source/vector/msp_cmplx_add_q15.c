@@ -38,9 +38,9 @@
 msp_status msp_cmplx_add_q15(const msp_cmplx_add_q15_params *params, const _q15 *srcA, const _q15 *srcB, _q15 *dst)
 {
     msp_add_q15_params paramsTemp;
-    
+
     /* Use real vector addition function. */
     paramsTemp.length = params->length << 1;
-    
+
     return msp_add_q15(&paramsTemp, srcA, srcB, dst);
 }

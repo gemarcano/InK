@@ -51,7 +51,7 @@
 void setup_activity_interrupt()
 {
     //pin1 inactivity
-    //pin2 activity 
+    //pin2 activity
     i2c_write(ADXL345_ADDRESS,ADXL345_REG_INT_MAP,adx345_int_activity);
 
     i2c_write(ADXL345_ADDRESS,ADXL345_REG_THRESH_ACT,32);

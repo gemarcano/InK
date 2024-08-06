@@ -39,7 +39,7 @@ robot_conf conf =
 //ERROR
 #endif
 
-typedef enum 
+typedef enum
 {
     CALLIBRATE,
     FIND_OBJECT
@@ -47,7 +47,7 @@ typedef enum
 }patrol_state_t;
 
 
-typedef enum 
+typedef enum
 {
     SEARCH_FORWARD,
     SEARCH_LEFT,
@@ -56,7 +56,7 @@ typedef enum
 
 }seek_cmd_t;
 
-typedef enum 
+typedef enum
 {
     CALLIBRATING,
     SEEK,
@@ -143,7 +143,7 @@ int8_t len = 2;
 uint16_t inst[2] = { CURVE_RIGHT, 360 };
 
 ENTRY_TASK(main_task)
-{   
+{
 
     if (__GET(callibrated))
     {
@@ -180,9 +180,9 @@ TASK(find_object_task)
             found = 1;
             return find_object_course;
         }
-       
+
         __SET(prox_cal_idx,(__GET(prox_cal_idx) + 1)%MAX_PROX_DATA_BUFFER);
-        
+
         if (++cnt > MAX_PROX_DATA_BUFFER)
         {
             found = 1;
@@ -190,7 +190,7 @@ TASK(find_object_task)
             return main_task;
         }
     }
-    
+
 }
 
 TASK(find_object_course)
@@ -201,12 +201,12 @@ TASK(find_object_course)
         // PJOUT |= BIT6;
         __SET(cmd,SEARCH_LEFT);
         __SET(seek_cnt,0);                     //reset seek counter
-    
-    }else{   
+
+    }else{
 
         __SET(seek_cnt, ++__GET(seek_cnt));   //keep track of successive seek attempts
         __SET(bot_state, SEEK);
-        
+
         if (__GET(cmd) == SEARCH_FORWARD)
         {
             __SET(cmd,SEARCH_RIGHT);
@@ -262,13 +262,13 @@ TASK(find_object_course)
                 return move_task;
         }
         case DESTROY:
-            while(1);   
+            while(1);
     }
 
 }
 
-//the robot will perform a 360 turn to register its surrounding 
-//points of interest 
+//the robot will perform a 360 turn to register its surrounding
+//points of interest
 TASK(callibrate_init)
 {
     __SET(len, 2);
@@ -338,7 +338,7 @@ TASK(move_task)
         TA3CCTL0 = CCIE;                          // TACCR0 interrupt enabled
     }
 
-    return execute_move;   
+    return execute_move;
 }
 
 // compute PID output
@@ -346,14 +346,14 @@ static inline float pid_compute(float input,float set,float *iterm,float *prev,f
     float err, dinp, output;
 
     err = set - input;
-    
+
     *iterm += ki * err;
-    
+
     if(*iterm > out_max)
         *iterm = out_max;
     else if(*iterm < out_min)
         *iterm = out_min;
-    
+
     dinp = input - *prev;
     output = kp*err + *iterm + kd*dinp;
     /*if(output > out_max)
@@ -374,7 +374,7 @@ TASK(execute_move)
     local_prev = __GET(prev);
 
     while(lock == LOCKED);
-    
+
     data = gyro_read();
     omega = data / 32.767;
     float ang = __GET(ang);
@@ -419,10 +419,10 @@ TASK(execute_move)
     __SET(prev,local_prev);
     drv_mot(__GET(lspeed),__GET(rspeed));
     lock  = LOCKED;
-    
+
     //update the proximity data
     switch (__GET(bot_state))
-    {   
+    {
         case SEEK:
         case DESTROY:
             __SET(target_prox,prox_read());
@@ -430,7 +430,7 @@ TASK(execute_move)
         case CALLIBRATING:
             __SET(prox_cal_data[__GET(prox_cal_idx)],prox_read());
             __SET(prox_cal_idx, (__GET(prox_cal_idx)+1)%MAX_PROX_DATA_BUFFER);
-        default:    
+        default:
             break;
 
     }
@@ -456,10 +456,10 @@ TASK(move_complete)
     __SET(ang, 0);
     __SET(stop,1);
     __SET(cp,0);
-    
+
     switch (__GET(bot_state))
     {
-        
+
         case SEEK:
         case DESTROY:
             return find_object_course;

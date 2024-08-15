@@ -53,6 +53,7 @@ uint16_t min_pdc;
 // 0 persistent - 1 dirty persistent
 extern pers_timer_t per_timer_vars[];
 
+// local, in RAM copies of the timer timing structures
 timing_d wkup_timing[MAX_WKUP_THREADS];
 timing_d xpr_timing[MAX_XPR_THREADS];
 timing_d pdc_timing[MAX_PDC_THREADS];
@@ -171,7 +172,7 @@ void refresh_wkup_timers(){
         set_timer_wkup(min_wkup);
     }
     //no pending wake up timer was found.
-    else stop_timer();
+    else stop_timer_wkup();
 
 
 }
@@ -179,17 +180,17 @@ void refresh_wkup_timers(){
 // sets a one-shot timer using Timer A2
 void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
 {
-    uint8_t i,cmpl = 0;
+    uint8_t cmpl = 0;
 
     //fetch from persistent buffer to local variables
     unpack_wkup_to_local();
 
     //init the timer
     //TODO:check if needed
-    stop_timer();
+    stop_timer_wkup();
 
     //set the compare register on the device
-    for (i = 0; i < MAX_WKUP_THREADS; i++)
+    for (uint8_t i = 0; i < MAX_WKUP_THREADS; i++)
     {
         if (wkup_timing[i].status == NOT_USED)
         {
@@ -209,7 +210,7 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
         refresh_wkup_timers();
 
     }else{
-
+		// FIXME why hardcoding 2 here? what if MAX_WKUP_THREADS is less than 3?
         //buffer is full
         //TODO: ADD failcheck
         wkup_timing[2].data = ticks;
@@ -500,7 +501,7 @@ void refresh_pdc_timers(){
         set_timer_pdc(min_pdc);
     }
     //no pending wake up timer was found.
-    else stop_timer();
+    else stop_timer_pdc();
 
 
 

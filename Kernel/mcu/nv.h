@@ -1,10 +1,13 @@
+// SPDX-License-Identifier: LGPL-3.0
+// SPDX-FileCopyrightText: 2024 Gabriel Marcano <gmarcano@ucsd.edu>
+
 // This file is part of InK.
 //
-// author = "Kasım Sinan Yıldırım "
-// maintainer = "Kasım Sinan Yıldırım "
-// email = "sinanyil81 [at] gmail.com"
+// author = "Gabriel Marcano"
+// maintainer = "Gabriel Marcano"
+// email = "gmarcano@ucsd.edu"
 //
-// copyright = "Copyright 2018 Delft University of Technology"
+// copyright = "Copyright 2024 Gabriel Marcano"
 // license = "LGPL"
 // version = "3.0"
 // status = "Production"
@@ -22,32 +25,25 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>./*
- /* mcu.h
+ /* nv.h
  *
- *  Created on: 15 Feb 2018
+ *  Created on: 6 Aug 2024
  *
  */
 
-#ifndef MCU_H_
-#define MCU_H_
+#ifndef NV_H_
+#define NV_H_
 
-#include "nv.h"
-
-void __mcu_init(void);
-void __mcu_sleep(void);
-
-#ifndef __ti__
-void __enable_interrupt(void);
-void __disable_interrupt(void);
+/* defines non-volatile variable */
+#ifdef __GNUC__
+    #define __nv    __attribute__((section(".nv_vars")))
+#elif defined(__ti__)
+    #define __nv __attribute__((section(".TI.persistent")))
+#else
+	#error "Unknown compiler, unsure where to store non-volatile memory"
 #endif
 
-/**
- *
- * @param[in] from Address to start copy from
- * @param[out] to Address to copy to copy from
- * @param[in] size Number of words to copy
- *
- */
-void __fast_word_copy(void *from, void *to, unsigned short size);
 
-#endif /* MCU_H_ */
+void __dma_copy(unsigned int from, unsigned int to, unsigned short size);
+
+#endif /* NV_H_ */

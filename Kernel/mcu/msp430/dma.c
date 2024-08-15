@@ -30,7 +30,8 @@
 #include "msp430.h"
 
 // size should be in words
-void __dma_word_copy(unsigned int from, unsigned int to, unsigned short size)
+
+void __fast_word_copy(void *from, void *to, unsigned short size)
 {
     // Configure DMA channel 0
     __data16_write_addr((unsigned short) &DMA0SA,(unsigned long) from);

@@ -32,14 +32,23 @@
 //
 #include "mcu_specifics/clk.h"
 
+/** Initialize the timer subsystem.
+ *
+ * Initializes the underlying persistent timers.
+ */
 void __timers_init();
+
+/** Commits pending updates to timers, refreshes their state, and commits that.
+ */
 void __reboot_timers();
 
 //WKUP timers
 //These timers are set to schedule an ISR for a specified time
 /*************************************************************************************************************/
 
-//clears the status flag on wkup_d struct containing the thread/timing information for the one shot timer
+/**clears the status flag on wkup_d struct containing the thread/timing
+ * information for the one shot timer
+ */
 void clear_wkup_status(uint8_t thread_id);
 
 //unload persistent buffer to local variables for fewer fram accesses

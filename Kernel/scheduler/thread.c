@@ -40,7 +40,7 @@ static inline void __prologue(thread_t *thread)
     __port_on(3,6);
 #endif
     // copy original stack to the temporary stack
-    __dma_word_copy(buffer->buf[buffer->idx],buffer->buf[buffer->idx ^ 1], buffer->size>>1);
+    __fast_word_copy(buffer->buf[buffer->idx],buffer->buf[buffer->idx ^ 1], buffer->size>>1);
 #ifdef RAISE_PIN
     __port_off(3,6);
 #endif

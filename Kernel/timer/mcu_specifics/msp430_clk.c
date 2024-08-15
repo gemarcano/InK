@@ -26,6 +26,10 @@
 #include "clk.h"
 #include "ink.h"
 
+#define RTC 0x53
+#define RTC_LOW_REG 0x00
+#define RTC_CONF_REG 0x01
+#define NUM_BYTES_RX 2
 
 __nv uint32_t current_ticks;
 

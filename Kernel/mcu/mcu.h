@@ -22,7 +22,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>./*
- /* mcu.h
+/* mcu.h
  *
  *  Created on: 15 Feb 2018
  *
@@ -48,6 +48,6 @@ void __disable_interrupt(void);
  * @param[in] size Number of words to copy
  *
  */
-void __fast_word_copy(void *from, void *to, unsigned short size);
+void __fast_word_copy(void* from, void* to, unsigned short size);
 
 #endif /* MCU_H_ */

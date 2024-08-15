@@ -26,72 +26,77 @@
 #define PERS_TMR_
 #include "ink.h"
 
-//how many timing Ink interfaces are used
+// how many timing Ink interfaces are used
 #define TIMER_TOOLS 3
 #define MAX_TIMED_THREADS 3
 #define MAX_WKUP_THREADS 3
 #define MAX_XPR_THREADS 3
 #define MAX_PDC_THREADS 1
 
-//TODO:make sure types are correctly used
-typedef enum{TIMER_INSERT,TIMER_COMMIT,TIMER_DONE} tmr_st;
+// TODO:make sure types are correctly used
+typedef enum { TIMER_INSERT,
+    TIMER_COMMIT,
+    TIMER_DONE } tmr_st;
 
-typedef enum{NOT_DIRTY,DIRTY} dirty_st;
+typedef enum { NOT_DIRTY,
+    DIRTY } dirty_st;
 
-typedef enum{NOT_USED,USED} used_st;
+typedef enum { NOT_USED,
+    USED } used_st;
 
-typedef enum{WKUP,PDC,XPR} ink_time_interface_t;
+typedef enum { WKUP,
+    PDC,
+    XPR } ink_time_interface_t;
 
 /**
  * Contains the timing data for each timer
  */
 typedef struct
 {
-    used_st status;/** USED - NOT_USED*/
-    uint8_t thread_id;  /** thread ID*/
-    int32_t data;      /** remaining time for thread execution*/
-    dirty_st __dirty;    /** DIRTY - NOT_DIRTY*/
+    used_st status; /** USED - NOT_USED*/
+    uint8_t thread_id; /** thread ID*/
+    int32_t data; /** remaining time for thread execution*/
+    dirty_st __dirty; /** DIRTY - NOT_DIRTY*/
 
-}timing_d;
+} timing_d;
 
 /**
  * Contains the next thread to be executed persistent timer
  */
 typedef struct
 {
-	used_st status;/** USED - NOT_USED*/
-	uint8_t next_thread;/** next thread candidate*/
-	uint16_t next_time; /** next timing candidate*/
-	dirty_st __dirty;/** DIRTY - NOT_DIRTY*/
+    used_st status; /** USED - NOT_USED*/
+    uint8_t next_thread; /** next thread candidate*/
+    uint16_t next_time; /** next timing candidate*/
+    dirty_st __dirty; /** DIRTY - NOT_DIRTY*/
 
-}next_d;
+} next_d;
 
 /** Contains system on/off time.
  *
  */
 typedef struct
 {
-	uint16_t on_time;   /**time the system has been on*/
-	uint16_t off_time; /** time the system has been off*/
-	dirty_st __dirty;   /** DIRTY - NOT_DIRTY*/
+    uint16_t on_time; /**time the system has been on*/
+    uint16_t off_time; /** time the system has been off*/
+    dirty_st __dirty; /** DIRTY - NOT_DIRTY*/
 
-}pers_time_d;
+} pers_time_d;
 
 /**
  * Contains timing data for WakeUp/Expiration/Periodic timer,
  * global time,and next thread to be fired by each timer.
  *
-*/
+ */
 typedef struct
 {
-	timing_d wkup_timing[MAX_WKUP_THREADS];/**Timings for WakeUp timer*/
-	timing_d xpr_timing[MAX_XPR_THREADS]; /**Timings for Expiration timer*/
-	timing_d pdc_timing[MAX_PDC_THREADS]; /**Timings for Periodic timer*/
-	next_d next_info[TIMER_TOOLS];			/**Next time to be executed persistent timer*/
-	pers_time_d time_bank;					/**Global time*/
+    timing_d wkup_timing[MAX_WKUP_THREADS]; /**Timings for WakeUp timer*/
+    timing_d xpr_timing[MAX_XPR_THREADS]; /**Timings for Expiration timer*/
+    timing_d pdc_timing[MAX_PDC_THREADS]; /**Timings for Periodic timer*/
+    next_d next_info[TIMER_TOOLS]; /**Next time to be executed persistent timer*/
+    pers_time_d time_bank; /**Global time*/
 
-}pers_timer_t;
-
+} pers_timer_t;
 
 /**
  * Initialize the buffers for holding timing information
@@ -106,7 +111,7 @@ void _pers_timer_init();
  * @param interface The type of the timer to update.
  * @param time_data The data to store in the timer.
  */
-void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface , uint32_t time_data);
+void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface, uint32_t time_data);
 
 /** Updates the thread value of the specified timer.
  *
@@ -116,7 +121,7 @@ void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface , uint3
  * @param interface The type of the timer to update.
  * @param thread_id Thread ID to store in the timer.
  */
-void _pers_timer_update_thread_id(uint8_t idx, ink_time_interface_t interface , uint8_t thread_id);
+void _pers_timer_update_thread_id(uint8_t idx, ink_time_interface_t interface, uint8_t thread_id);
 
 /** Updates the status value of the specified timer.
  *
@@ -126,7 +131,7 @@ void _pers_timer_update_thread_id(uint8_t idx, ink_time_interface_t interface , 
  * @param interface The type of the timer to update.
  * @param status Status to store in the timer.
  */
-void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface , used_st status);
+void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface, used_st status);
 
 /** Updates the next thread to run for the specified timer.
  *
@@ -135,7 +140,7 @@ void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface , use
  * @param interface The type of the timer to associate a next thread with.
  * @param next_tread The ID of the next thread for executing set for this timer
  */
-void _pers_timer_update_nxt_thread(ink_time_interface_t interface ,uint8_t next_thread);
+void _pers_timer_update_nxt_thread(ink_time_interface_t interface, uint8_t next_thread);
 
 /** Updates the time remaining in the timer for the next event.
  *
@@ -144,8 +149,7 @@ void _pers_timer_update_nxt_thread(ink_time_interface_t interface ,uint8_t next_
  */
 void _pers_timer_update_nxt_time(ink_time_interface_t interface, uint16_t next_time);
 
-
-//collect data from the perssistent buffer
+// collect data from the perssistent buffer
 /** Gets the timing structure for the specified timer.
  *
  * @param idx The index of the timer to fetch.
@@ -175,7 +179,7 @@ uint16_t _pers_timer_get_data(uint8_t idx, ink_time_interface_t interface);
  *
  * @return The thread id of the specified timer.
  */
-uint8_t _pers_timer_get_thread_id(uint8_t idx, ink_time_interface_t interface );
+uint8_t _pers_timer_get_thread_id(uint8_t idx, ink_time_interface_t interface);
 
 /** Gets the status for the specified timer.
  *
@@ -206,7 +210,7 @@ uint8_t _pers_timer_get_nxt_thread(ink_time_interface_t interface);
  */
 uint16_t _pers_timer_get_nxt_time(ink_time_interface_t interface);
 
-//timer buffer is ready to commit
+// timer buffer is ready to commit
 /** Marks the specified timer as ready to be committed to non-volatile memory.
  *
  * FIXME nothing about this implementation actually uses the underlying variable as a lock...
@@ -215,7 +219,7 @@ uint16_t _pers_timer_get_nxt_time(ink_time_interface_t interface);
  */
 void _pers_timer_update_lock(ink_time_interface_t interface);
 
-//commit into the persistent buffer
+// commit into the persistent buffer
 /** Commits the memory of the specified timer to non-volatile memory.
  *
  * This only does something if the timer has been marked as ready for commit.

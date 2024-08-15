@@ -25,7 +25,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>./*
- /* nv.h
+/* nv.h
  *
  *  Created on: 6 Aug 2024
  *
@@ -36,13 +36,12 @@
 
 /* defines non-volatile variable */
 #ifdef __GNUC__
-    #define __nv    __attribute__((section(".nv_vars")))
+#define __nv __attribute__((section(".nv_vars")))
 #elif defined(__ti__)
-    #define __nv __attribute__((section(".TI.persistent")))
+#define __nv __attribute__((section(".TI.persistent")))
 #else
-	#error "Unknown compiler, unsure where to store non-volatile memory"
+#error "Unknown compiler, unsure where to store non-volatile memory"
 #endif
-
 
 void __dma_copy(unsigned int from, unsigned int to, unsigned short size);
 

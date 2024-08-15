@@ -22,7 +22,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>./*
- /* memory.h
+/* memory.h
  *
  *  Created on: 14 Feb 2018
  *
@@ -33,11 +33,10 @@
 
 /* defines non-volatile variable */
 #ifdef __GNUC__
-    #define __nv    __attribute__((section(".nv_vars")))
+#define __nv __attribute__((section(".nv_vars")))
 #else
-    #define __nv __attribute__((section(".TI.persistent")))
+#define __nv __attribute__((section(".TI.persistent")))
 #endif
-
 
 void __dma_copy(unsigned int from, unsigned int to, unsigned short size);
 

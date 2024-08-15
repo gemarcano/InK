@@ -26,11 +26,10 @@
 #define _CLK_H_
 #include "ink.h"
 
-//timer controls
+// timer controls
 #ifdef TIMERS_ON
 #define UART_TIME 44
 #endif
-
 
 /** Starts the __get_time interface.
  *
@@ -49,7 +48,6 @@ void __get_time_stop(void);
  * return current ticks + number of times the current timer has overflown
  */
 uint32_t __get_time(void);
-
 
 void __setup_rtc(void);
 

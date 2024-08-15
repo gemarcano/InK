@@ -24,6 +24,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "persistent_timer.h"
 
+static volatile __nv tmr_st pdc_tstatus = TIMER_DONE;/**Initialize the Periodic state timer commit state machine */
+static volatile __nv tmr_st xpr_tstatus = TIMER_DONE;/**Initialize the Expire state timer commit state machine */
+static volatile __nv tmr_st wkup_tstatus = TIMER_DONE;/**Initialize the WakeUp state timer commit state machine */
 
 // 0 persistent - 1 dirty persistent
 // double buffer
@@ -58,8 +61,6 @@ void _pers_timer_update_data(uint8_t idx,ink_time_interface_t interface , uint32
 		default:
 			break;
 	}
-
-
 }
 
 void _pers_timer_update_thread_id(uint8_t idx,ink_time_interface_t interface , uint8_t thread_id){
@@ -81,7 +82,6 @@ void _pers_timer_update_thread_id(uint8_t idx,ink_time_interface_t interface , u
 		default:
 			break;
 	}
-
 }
 
 void _pers_timer_update_status(uint8_t idx,ink_time_interface_t interface , used_st status){
@@ -120,7 +120,7 @@ void _pers_timer_update_nxt_time(ink_time_interface_t ink_time_interface, uint16
 
 //timer buffer is ready to commit
 void _pers_timer_update_lock(ink_time_interface_t interface){
-switch (interface)
+	switch (interface)
 	{
 		case WKUP:
 			wkup_tstatus = TIMER_COMMIT;
@@ -140,7 +140,7 @@ switch (interface)
 
 //commit into the persistent buffer
 
-void _commit_timer_buffers(ink_time_interface_t interface){
+static void _commit_timer_buffers(ink_time_interface_t interface){
 
 	uint8_t i;
 
@@ -223,7 +223,7 @@ switch (interface)
 	}
 }
 
-timing_d _pers_timer_get(uint8_t idx,ink_time_interface_t interface ){
+timing_d _pers_timer_get(uint8_t idx,ink_time_interface_t interface){
 	switch (interface)
 	{
 		case WKUP:
@@ -238,50 +238,46 @@ timing_d _pers_timer_get(uint8_t idx,ink_time_interface_t interface ){
 
 }
 
-uint16_t _pers_timer_get_data(uint8_t idx,ink_time_interface_t interface ){
+uint16_t _pers_timer_get_data(uint8_t idx,ink_time_interface_t interface){
 	//get the persistent timer from persistent buffer
 	switch (interface)
 	{
 		case WKUP:
-			return pers_timer_vars[0].wkup_timing[idx].data ;
+			return pers_timer_vars[0].wkup_timing[idx].data;
 		case XPR:
-			return pers_timer_vars[0].xpr_timing[idx].data ;
+			return pers_timer_vars[0].xpr_timing[idx].data;
 		case PDC:
-			return pers_timer_vars[0].pdc_timing[idx].data ;
+			return pers_timer_vars[0].pdc_timing[idx].data;
 		default:
 			return 0;
-
 	}
-
 }
 
-uint8_t _pers_timer_get_thread_id(uint8_t idx,ink_time_interface_t interface ){
+uint8_t _pers_timer_get_thread_id(uint8_t idx,ink_time_interface_t interface){
 	//get the persistent timer from persistent buffer
 	switch (interface)
 	{
 		case WKUP:
-			return pers_timer_vars[0].wkup_timing[idx].thread_id ;
+			return pers_timer_vars[0].wkup_timing[idx].thread_id;
 		case XPR:
-			return pers_timer_vars[0].xpr_timing[idx].thread_id ;
+			return pers_timer_vars[0].xpr_timing[idx].thread_id;
 		case PDC:
-			return pers_timer_vars[0].pdc_timing[idx].thread_id ;
+			return pers_timer_vars[0].pdc_timing[idx].thread_id;
 		default:
-		    return	0;
+		    return 0;
 	}
-
-
 }
 
-used_st _pers_timer_get_status(uint8_t idx,ink_time_interface_t interface ){
+used_st _pers_timer_get_status(uint8_t idx,ink_time_interface_t interface){
 	//get the persistent timer from persistent buffer
 switch (interface)
 	{
 		case WKUP:
-			return pers_timer_vars[0].wkup_timing[idx].status ;
+			return pers_timer_vars[0].wkup_timing[idx].status;
 		case XPR:
-			return pers_timer_vars[0].xpr_timing[idx].status ;
+			return pers_timer_vars[0].xpr_timing[idx].status;
 		case PDC:
-			return pers_timer_vars[0].pdc_timing[idx].status ;
+			return pers_timer_vars[0].pdc_timing[idx].status;
 		default:
 		    return USED;
 	}
@@ -296,3 +292,4 @@ uint16_t _pers_timer_get_nxt_time(ink_time_interface_t ink_time_interface){
 	//get the persistent timer from persistent buffer
 	return pers_timer_vars[0].next_info[ink_time_interface].next_time;
 }
+

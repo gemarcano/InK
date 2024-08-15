@@ -66,6 +66,9 @@ typedef struct
 
 }next_d;
 
+/** Contains system on/off time.
+ *
+ */
 typedef struct
 {
 	uint16_t on_time;   /**time the system has been on*/
@@ -90,112 +93,135 @@ typedef struct
 }pers_timer_t;
 
 
-static volatile __nv tmr_st pdc_tstatus = TIMER_DONE;/**Initialize the Periodic state timer commit state machine */
-static volatile __nv tmr_st xpr_tstatus = TIMER_DONE;/**Initialize the Expire state timer commit state machine */
-static volatile __nv tmr_st wkup_tstatus = TIMER_DONE;/**Initialize the WakeUp state timer commit state machine */
-
 /**
  * Initialize the buffers for holding timing information
  */
 void _pers_timer_init();
 
-/**
- * @param idx Index
- * @param interface selected timer
- * @param time data timing data
+/** Updates the time value of the specified timer.
+ *
+ * This sets the timer's dirty flag to true.
+ *
+ * @param idx The index of the timer to update.
+ * @param interface The type of the timer to update.
+ * @param time_data The data to store in the timer.
  */
 void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface , uint32_t time_data);
 
-/**
- * @param idx Index
- * @param interface selected timer
- * @param thread_id Thread ID
+/** Updates the thread value of the specified timer.
+ *
+ * This sets the timer's dirty flag to true.
+ *
+ * @param idx The index of the timer to update.
+ * @param interface The type of the timer to update.
+ * @param thread_id Thread ID to store in the timer.
  */
 void _pers_timer_update_thread_id(uint8_t idx, ink_time_interface_t interface , uint8_t thread_id);
 
-/**
- * @param idx Index
- * @param interface selected timer
- * @param status Status of the buffer
+/** Updates the status value of the specified timer.
+ *
+ * This sets the timer's dirty flag to true.
+ *
+ * @param idx The index of the timer to update.
+ * @param interface The type of the timer to update.
+ * @param status Status to store in the timer.
  */
 void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface , used_st status);
 
-/**
- * @param interface selected timer
- * @param next_tread next thread for executing set for this timer
+/** Updates the next thread to run for the specified timer.
+ *
+ * This sets the next thread timer's dirty flag to true.
+ *
+ * @param interface The type of the timer to associate a next thread with.
+ * @param next_tread The ID of the next thread for executing set for this timer
  */
 void _pers_timer_update_nxt_thread(ink_time_interface_t interface ,uint8_t next_thread);
 
-/**
- * @param interface selected timer
- * @param  next_time remaining time for next interrupt event
+/** Updates the time remaining in the timer for the next event.
+ *
+ * @param interface The type of the timer to update its next trigger time.
+ * @param next_time The remaining time for next interrupt event (FIXME what units?)
  */
 void _pers_timer_update_nxt_time(ink_time_interface_t interface, uint16_t next_time);
 
 
 //collect data from the perssistent buffer
-/**
- * @param idx Index
- * @param interface selected timer
- * @return Timing information from the persistent buffer
+/** Gets the timing structure for the specified timer.
+ *
+ * @param idx The index of the timer to fetch.
+ * @param interface The type of the timer to fetch.
+ *
+ * @return Timing information from the persistent buffer.
  */
-timing_d _pers_timer_get(uint8_t idx, ink_time_interface_t interface );
+timing_d _pers_timer_get(uint8_t idx, ink_time_interface_t interface);
 
-/**
- * @param	idx 	Index
- * @param	interface 	selected timer
- * @return	time information from persistent buffer
+/** Get the timer data for the specified timer.
+ *
+ * This is a subset of the data returned by _pers_timer_get.
+ *
+ * @param idx The index of the timer to fetch.
+ * @param interface  The type of the timer to fetch.
+ *
+ * @return The time (FIXME units?) of the specified timer.
  */
-uint16_t _pers_timer_get_data(uint8_t idx, ink_time_interface_t interface );
+uint16_t _pers_timer_get_data(uint8_t idx, ink_time_interface_t interface);
 
-/**
- * @param	idx 	Index
- * @param	interface 	selected timer
- * @return  thread id
+/** Gets the thread id for the specified timer.
+ *
+ * This is a subset of the data returned by _pers_timer_get.
+ *
+ * @param idx The index of the timer to fetch.
+ * @param interface The type of the timer to fetch.
+ *
+ * @return The thread id of the specified timer.
  */
 uint8_t _pers_timer_get_thread_id(uint8_t idx, ink_time_interface_t interface );
 
-/**
- * @param	idx 	Index
- * @param	interface 	selected timer
- * @return	timer status
+/** Gets the status for the specified timer.
+ *
+ * This is a subset of the data returned by _pers_timer_get.
+ *
+ * @param idx The index of the timer to fetch.
+ * @param interface The type of the timer to fetch.
+ *
+ * @return The status of the specified timer.
  */
-used_st _pers_timer_get_status(uint8_t idx, ink_time_interface_t interface );
+used_st _pers_timer_get_status(uint8_t idx, ink_time_interface_t interface);
 
-/**
- * @param	idx 	Index
- * @param	interface 	selected timer
- * @return  next thread for execution
+/** Returns the next thread id of the specified timer.
+ *
+ * @param idx The index of the timer to fetch.
+ * @param interface The type of the timer to fetch.
+ *
+ * @return The thread ID of the next thread.
  */
 uint8_t _pers_timer_get_nxt_thread(ink_time_interface_t interface);
 
-/**
- * @param	idx 	Index
- * @param	interface 	selected timer
- * @return  next time for execution
+/** Returns the next time of the specified timer.
+ *
+ * @param idx The index of the timer to fetch.
+ * @param interface The type of the timer to fetch.
+ *
+ * @return The next time of the timer.
  */
 uint16_t _pers_timer_get_nxt_time(ink_time_interface_t interface);
 
-
 //timer buffer is ready to commit
-/**
- * Lock the dirty buffer and prepare for commit
- * @param interface selected timer
+/** Marks the specified timer as ready to be committed to non-volatile memory.
+ *
+ * FIXME nothing about this implementation actually uses the underlying variable as a lock...
+ *
+ * @param interface The type of the timer to mark as ready for commit.
  */
 void _pers_timer_update_lock(ink_time_interface_t interface);
 
 //commit into the persistent buffer
-/**
- * Commit to persistent safe buffer
- * @param interface selected timer
+/** Commits the memory of the specified timer to non-volatile memory.
+ *
+ * This only does something if the timer has been marked as ready for commit.
+ *
+ * @param interface The type of the timer to commit.
  */
 void _pers_timer_commit(ink_time_interface_t interface);
-
-//internal function
-/**
- * Internal function for commiting data
- * @param interface selected timer
- */
-void _commit_timer_buffers(ink_time_interface_t interface);
 
 #endif

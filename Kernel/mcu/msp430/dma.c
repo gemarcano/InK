@@ -22,7 +22,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>./*
- /* flush.c
+/* flush.c
  *
  *  Created on: 14 Feb 2018
  *
@@ -31,16 +31,16 @@
 
 // size should be in words
 
-void __fast_word_copy(void *from, void *to, unsigned short size)
+void __fast_word_copy(void* from, void* to, unsigned short size)
 {
     // Configure DMA channel 0
-    __data16_write_addr((unsigned short) &DMA0SA,(unsigned long) from);
-                                              // Source block address
-    __data16_write_addr((unsigned short) &DMA0DA,(unsigned long) to);
-                                              // Destination single address
-    DMA0SZ = size;                          // Block size
+    __data16_write_addr((unsigned short)&DMA0SA, (unsigned long)from);
+    // Source block address
+    __data16_write_addr((unsigned short)&DMA0DA, (unsigned long)to);
+    // Destination single address
+    DMA0SZ = size; // Block size
     DMA0CTL = DMADT_5 | DMASRCINCR_3 | DMADSTINCR_3; // Rpt, inc
-    DMA0CTL |= DMAEN;                         // Enable DMA0
+    DMA0CTL |= DMAEN; // Enable DMA0
 
-    DMA0CTL |= DMAREQ;                      // Trigger block transfer
+    DMA0CTL |= DMAREQ; // Trigger block transfer
 }

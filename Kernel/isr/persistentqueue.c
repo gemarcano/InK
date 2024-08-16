@@ -28,18 +28,20 @@
  *
  */
 
-#include "ink.h"
 #include "persistentqueue.h"
+#include "ink.h"
 
 // inits the persistent queue
-void __perqueue_init(per_queue_t *queue){
+void __perqueue_init(per_queue_t* queue)
+{
     queue->_head ^= queue->_head;
     queue->_tail ^= queue->_tail;
     queue->__head ^= queue->__head;
     queue->__tail ^= queue->__tail;
 }
 
-uint8_t __perqueue_is_empty(per_queue_t *queue){
+uint8_t __perqueue_is_empty(per_queue_t* queue)
+{
     // if there is no event in the persistent queue
     if (queue->_head == queue->_tail) {
         return 1;
@@ -48,10 +50,11 @@ uint8_t __perqueue_is_empty(per_queue_t *queue){
     return 0;
 }
 
-uint8_t __perqueue_is_full(per_queue_t *queue){
+uint8_t __perqueue_is_full(per_queue_t* queue)
+{
     // use the temporary variable to calculate the next slot for the tail
     queue->__tail = queue->_tail + 1;
-    if (queue->__tail == MAX_QUEUE_ITEMS){
+    if (queue->__tail == MAX_QUEUE_ITEMS) {
         queue->__tail = 0;
     }
 
@@ -63,7 +66,8 @@ uint8_t __perqueue_is_full(per_queue_t *queue){
     return 0;
 }
 
-uint8_t __perqueue_push(per_queue_t *queue,void *item){
+uint8_t __perqueue_push(per_queue_t* queue, void* item)
+{
     // use the temporary variable to calculate the next slot for the tail
     queue->__tail = queue->_tail + 1;
     if (queue->__tail == MAX_QUEUE_ITEMS)
@@ -82,15 +86,16 @@ uint8_t __perqueue_push(per_queue_t *queue,void *item){
 }
 
 /* commit the operation on the queue */
-void __perqueue_push_commit(per_queue_t *queue)
+void __perqueue_push_commit(per_queue_t* queue)
 {
     // update the real tail of the queue in one step so that the item is inserted!
     queue->_tail = queue->__tail;
 }
 
-void *__perqueue_pop(per_queue_t *queue){
+void* __perqueue_pop(per_queue_t* queue)
+{
     // if there is no item in the persistent queue
-    if (queue->_head == queue->_tail){
+    if (queue->_head == queue->_tail) {
         return NULL;
     }
 
@@ -103,7 +108,8 @@ void *__perqueue_pop(per_queue_t *queue){
 }
 
 // commit the operation on the queue
-void __perqueue_pop_commit(per_queue_t *queue){
+void __perqueue_pop_commit(per_queue_t* queue)
+{
     // remove the item from the queue with one step!
     queue->_head = queue->__head;
 }

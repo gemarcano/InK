@@ -47,8 +47,8 @@
  * Module settings
  */
 
-// #define WKUP_TIMER
-// #define XPR_TIMER
-// #define TIMERS_ON
+#define WKUP_TIMER
+#define XPR_TIMER
+#define TIMERS_ON
 
 #endif /* INK_H_ */

@@ -34,14 +34,15 @@
 
 #include <asimple/systick.h>
 
-#include "am_mcu_apollo.h"
 #include "am_bsp.h"
+#include "am_mcu_apollo.h"
 #include "am_util.h"
 
 #include <string.h>
 
-void __mcu_init(void) {
-	// FIXME initialize apollo3
+void __mcu_init(void)
+{
+    // FIXME initialize apollo3
     am_hal_clkgen_control(AM_HAL_CLKGEN_CONTROL_SYSCLK_MAX, 0);
     am_hal_cachectrl_config(&am_hal_cachectrl_defaults);
     am_hal_cachectrl_enable();
@@ -57,8 +58,8 @@ void __mcu_init(void) {
     systick_start();
 }
 
-void __mcu_sleep(void) {
-
+void __mcu_sleep(void)
+{
 }
 
 void __enable_interrupt(void)
@@ -72,10 +73,8 @@ void __disable_interrupt(void)
     am_hal_interrupt_master_disable();
 }
 
-void __fast_word_copy(void *from, void *to, unsigned short size)
+void __fast_word_copy(void* from, void* to, unsigned short size)
 {
-	// Apollo3 doesn't have general purposes DMA, so just use memcpy
-	memcpy(to, from, size * sizeof(int));
+    // Apollo3 doesn't have general purposes DMA, so just use memcpy
+    memcpy(to, from, size * sizeof(int));
 }
-
-

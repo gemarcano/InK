@@ -33,6 +33,8 @@
 #ifndef PRIORITY_H_
 #define PRIORITY_H_
 
+#include <stdint.h>
+
 #define NUM_PRIORITY_LEVEL 8
 #define NUM_PRIORITIES 64
 

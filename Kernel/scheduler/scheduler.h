@@ -36,6 +36,8 @@
 #include "task.h"
 #include "thread.h"
 
+#include <stdint.h>
+
 #define MAX_THREADS NUM_PRIORITIES
 
 void __scheduler_boot_init();

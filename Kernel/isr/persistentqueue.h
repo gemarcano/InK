@@ -31,6 +31,9 @@
 #ifndef COMM_PERSISTENTQUEUE_H_
 #define COMM_PERSISTENTQUEUE_H_
 
+#include "isr.h"
+#include <stdint.h>
+
 #define MAX_QUEUE_ITEMS MAX_PENDING_INTERRUPTS
 
 // a general persistent queue structure that works

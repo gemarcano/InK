@@ -237,7 +237,6 @@ void unpack_xpr_to_local()
 void refresh_xpr_timers()
 {
     uint8_t i, first = 1;
-    uint8_t nxt_xpr;
     int32_t min_xpr;
 
     for (i = 0; i < MAX_XPR_THREADS; i++) {
@@ -335,6 +334,12 @@ void stop_expire_timer(uint8_t thread_id)
     _pers_timer_update_lock(XPR);
     _pers_timer_commit(XPR);
 }
+
+uint8_t get_nxt_xpr(void)
+{
+    return nxt_xpr;
+}
+
 // PDC timers (EXPERIMENTAL)
 // These timers are set to schedule "periodic" execution of a thread
 // The timer starts counting from the time initiated up to the specified amount of time,
@@ -467,4 +472,9 @@ void clear_pdc_status(uint8_t thread_id)
             _pers_timer_update_status(i, PDC, NOT_USED);
         }
     }
+}
+
+uint8_t get_nxt_pdc(void)
+{
+    return nxt_pdc;
 }

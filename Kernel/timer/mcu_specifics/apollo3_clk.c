@@ -30,6 +30,9 @@
 #include "clk.h"
 #include "ink.h"
 
+#include "persistent_timer_commit/persistent_timer.h"
+#include "timer.h"
+
 static __nv uint32_t current_ticks;
 
 // This is used by get_time
@@ -127,11 +130,28 @@ void __setup_rtc()
 {
 }
 
+static void time_handler(void) { }
+static void wake_handler(void);
+static void expiration_handler(void);
+static void periodic_handler(void);
+
 void __setup_clock()
 {
     // am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA0C0INT_Msk, )
     //  Clock System Setup
+    am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA0C0INT_Msk, time_handler);
+
+#ifdef WKUP_TIMER
+    am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA1C0INT_Msk, wake_handler);
+#endif
+#ifdef XPR_TIMER
+    am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA2C0INT_Msk, expiration_handler);
+#endif
+#ifdef PDC_TIMER
+    am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA3C0INT_Msk, periodic_handler);
+#endif
 }
+
 uint32_t __get_rtc_time()
 {
     uint32_t buff;
@@ -177,6 +197,84 @@ uint32_t __get_time()
     uint32_t tmp = am_hal_ctimer_read(0, AM_HAL_CTIMER_TIMERA);
 
     return (tmp * 10 + current_ticks); // current_ticks/1000;
+}
+
+// the event that will be used to register the uart event
+static isr_event_t timer_event;
+
+/* the timer interrupt handler */
+// wkup_interrupt
+static void wake_handler(void)
+{
+    stop_timer_wkup();
+
+    if (!__EVENT_BUFFER_FULL(_pers_timer_get_nxt_thread(WKUP))) {
+        timer_event.data = NULL;
+        timer_event.size = 0;
+        timer_event.timestamp = __get_time();
+        //__on_time = TA2CCR0;
+        __SIGNAL_EVENT(_pers_timer_get_nxt_thread(WKUP), &timer_event);
+
+        // TODO: intermittent protection
+        unpack_wkup_to_local();
+        clear_wkup_status(_pers_timer_get_nxt_thread(WKUP));
+        refresh_wkup_timers();
+        _pers_timer_update_lock(WKUP);
+        _pers_timer_commit(WKUP);
+    }
+}
+
+/* the timer interrupt handler */
+// xpr_interrupt
+static void expiration_handler(void)
+{
+    /* stop timer */
+    stop_timer_xpr();
+
+    //__on_time = TA2CCR0;
+
+    // TODO: intermittent protection
+    unpack_xpr_to_local();
+    //__stop_thread(__get_thread(nxt_xpr));
+    __evict_thread(__get_thread(get_nxt_xpr()));
+    clear_xpr_status(_pers_timer_get_nxt_thread(XPR));
+    refresh_xpr_timers();
+
+    // FIXME what is this? a GPIO?
+    // P4OUT |= BIT2;
+    // P4OUT &= ~BIT2;
+
+    _pers_timer_update_lock(XPR);
+    _pers_timer_commit(XPR);
+}
+
+/* the timer interrupt handler */
+// pdc_interrupt
+static void periodic_handler(void)
+{
+    /* stop timer */
+    stop_timer_pdc();
+
+    if (!__EVENT_BUFFER_FULL(_pers_timer_get_nxt_thread(PDC))) {
+        timer_event.data = NULL;
+        timer_event.size = 0;
+        timer_event.timestamp = __get_time();
+        //__on_time = TA1CCR0;
+        __SIGNAL_EVENT(_pers_timer_get_nxt_thread(PDC), &timer_event);
+
+        // TODO: intermittent protection
+        // TODO: more clever implementation
+        // FIXME what is thread_id? This was here in the original implementation, which means this wasn't tested at all
+        uint8_t thread_id = get_nxt_pdc(); // FIXME this is a wild guess!!!
+        __set_pdc_period(__get_thread(thread_id), 1 + __get_pdc_period(__get_thread(thread_id))); // FIXME there was a ++ here, but I don't know what it's meant to do as __get_pdc_period doesn't return an lvalue!
+
+        unpack_pdc_to_local();
+        clear_pdc_status(_pers_timer_get_nxt_thread(PDC));
+        set_periodic_timer(_pers_timer_get_nxt_thread(PDC), __get_pdc_period(__get_thread(thread_id)) * __get_pdc_timer(__get_thread(thread_id)));
+        refresh_pdc_timers();
+        _pers_timer_update_lock(PDC);
+        _pers_timer_commit(PDC);
+    }
 }
 
 void am_ctimer_isr(void)

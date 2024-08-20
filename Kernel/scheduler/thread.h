@@ -33,6 +33,8 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
+#include <stdint.h>
+
 // the state of the threads
 typedef enum { TASK_READY = 1,
     TASK_RELEASE_EVENT = 2,

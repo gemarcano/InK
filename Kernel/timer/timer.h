@@ -46,7 +46,7 @@ void __reboot_timers();
 // These timers are set to schedule an ISR for a specified time
 /*************************************************************************************************************/
 
-/**clears the status flag on wkup_d struct containing the thread/timing
+/** Clears the status flag on wkup_d struct containing the thread/timing
  * information for the one shot timer
  */
 void clear_wkup_status(uint8_t thread_id);
@@ -78,6 +78,9 @@ void set_expire_timer(uint8_t thread_id, uint32_t ticks);
 
 void stop_expire_timer(uint8_t thread_id);
 
+// FIXME this gets the latest XPR thread ID processed by refresh_xpr_timers
+uint8_t get_nxt_xpr(void);
+
 // PDC timers (EXPERIMENTAL)
 // These timers are set to schedule "periodic" execution of a thread
 // The timer starts counting from the time initiated up to the specified amount of time,
@@ -98,5 +101,8 @@ void stop_periodic_timer(uint8_t thread_id);
 void refresh_pdc_timers();
 
 void clear_pdc_status(uint8_t thread_id);
+
+// FIXME this gets the latest PDC thread ID processed by refresh_pdc_timers
+uint8_t get_nxt_pdc(void);
 
 #endif

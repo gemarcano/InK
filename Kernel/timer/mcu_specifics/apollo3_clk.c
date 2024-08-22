@@ -79,7 +79,7 @@ void set_timer_wkup(uint16_t ticks)
 {
     am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA1);
     am_hal_ctimer_clear(1, AM_HAL_CTIMER_TIMERA);
-    am_hal_ctimer_config(1, &timer1_cfg);
+    am_hal_ctimer_config(1, (am_hal_ctimer_config_t*)&timer1_cfg);
 
     am_hal_ctimer_period_set(1, AM_HAL_CTIMER_TIMERA, ticks, 0);
     am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA1);
@@ -90,7 +90,7 @@ void set_timer_xpr(uint16_t ticks)
 {
     am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA2);
     am_hal_ctimer_clear(2, AM_HAL_CTIMER_TIMERA);
-    am_hal_ctimer_config(2, &timer2_cfg);
+    am_hal_ctimer_config(2, (am_hal_ctimer_config_t*)&timer2_cfg);
 
     am_hal_ctimer_period_set(2, AM_HAL_CTIMER_TIMERA, ticks, 0);
     am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA2);
@@ -119,7 +119,7 @@ void set_timer_pdc(uint16_t ticks)
 {
     am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA3);
     am_hal_ctimer_clear(3, AM_HAL_CTIMER_TIMERA);
-    am_hal_ctimer_config(3, &timer3_cfg);
+    am_hal_ctimer_config(3, (am_hal_ctimer_config_t*)&timer3_cfg);
 
     am_hal_ctimer_period_set(3, AM_HAL_CTIMER_TIMERA, ticks, 0);
     am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA3);
@@ -131,9 +131,16 @@ void __setup_rtc()
 }
 
 static void time_handler(void) { }
+
+#ifdef WKUP_TIMER
 static void wake_handler(void);
+#endif
+#ifdef XPR_TIMER
 static void expiration_handler(void);
+#endif
+#ifdef PDC_TIMER
 static void periodic_handler(void);
+#endif
 
 void __setup_clock()
 {
@@ -154,8 +161,7 @@ void __setup_clock()
 
 uint32_t __get_rtc_time()
 {
-    uint32_t buff;
-    uint32_t current_time;
+    return 0; // FIXME
 }
 
 /*
@@ -171,7 +177,7 @@ void __get_time_init()
 
     am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA0);
     am_hal_ctimer_clear(0, AM_HAL_CTIMER_TIMERA);
-    am_hal_ctimer_config(0, &timer0_cfg);
+    am_hal_ctimer_config(0, (am_hal_ctimer_config_t*)&timer0_cfg);
 
     am_hal_ctimer_period_set(0, AM_HAL_CTIMER_TIMERA, 256, 128);
     am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA0);
@@ -202,6 +208,7 @@ uint32_t __get_time()
 // the event that will be used to register the uart event
 static isr_event_t timer_event;
 
+#ifdef WKUP_TIMER
 /* the timer interrupt handler */
 // wkup_interrupt
 static void wake_handler(void)
@@ -223,7 +230,9 @@ static void wake_handler(void)
         _pers_timer_commit(WKUP);
     }
 }
+#endif
 
+#ifdef XPR_TIMER
 /* the timer interrupt handler */
 // xpr_interrupt
 static void expiration_handler(void)
@@ -247,7 +256,9 @@ static void expiration_handler(void)
     _pers_timer_update_lock(XPR);
     _pers_timer_commit(XPR);
 }
+#endif
 
+#ifdef PDC_TIMER
 /* the timer interrupt handler */
 // pdc_interrupt
 static void periodic_handler(void)
@@ -276,6 +287,7 @@ static void periodic_handler(void)
         _pers_timer_commit(PDC);
     }
 }
+#endif
 
 void am_ctimer_isr(void)
 {

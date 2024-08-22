@@ -66,22 +66,25 @@ void __tick(thread_t* thread)
             // an event
             isr_event_t* event = __lock_event(thread);
             // push event data to the entry task
-            thread->next = (void*)((entry_task_t)thread->entry)(buf, (void*)event);
+            thread->next = ((entry_task_t)thread->entry)(buf, (void*)event);
             // the event should be released (deleted)
             thread->state = TASK_RELEASE_EVENT;
         } else {
-            thread->next = (void*)(((task_t)thread->next)(buf));
+            thread->next = ((task_t)thread->next)(buf);
             thread->state = TASK_FINISHED;
             break;
         }
+        // fallthrough
     case TASK_RELEASE_EVENT:
         // release any event which is popped by the task
         __release_event(thread);
         thread->state = TASK_FINISHED;
+        // fallthrough
     case TASK_FINISHED:
         // switch stack index to commit changes
         thread->buffer._idx = thread->buffer.idx ^ 1;
         thread->state = TASK_COMMIT;
+        // fallthrough
     case TASK_COMMIT:
         // copy the real index from temporary index
         thread->buffer.idx = thread->buffer._idx;
@@ -103,5 +106,8 @@ void __tick(thread_t* thread)
             // ready to execute successive tasks
             thread->state = TASK_READY;
         }
+        // fallthrough
+    case THREAD_STOPPED:
+        // FIXME Do nothing?
     }
 }

@@ -29,12 +29,6 @@
 #define MAX_TIMED_THREADS 3
 #define MAX_XPR_THREADS 3
 #define MAX_PDC_THREADS 1
-// persistent timers "emulation"
-// TODO:Fix that
-typedef uint16_t __pers_time_t;
-
-static __pers_time_t __on_time = 0;
-static __pers_time_t __off_time = 0;
 
 // global
 // TODO:check if needed
@@ -44,7 +38,6 @@ static uint8_t nxt_wkup;
 static uint16_t min_wkup;
 
 static uint8_t nxt_xpr;
-static uint16_t min_xpr;
 
 static uint8_t nxt_pdc;
 static uint16_t min_pdc;

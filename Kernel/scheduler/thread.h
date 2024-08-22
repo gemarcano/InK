@@ -51,13 +51,15 @@ typedef struct {
     uint16_t size; // sizes of the buffers
 } buffer_t;
 
+typedef void (*void_func)(void);
+
 // the task definition (single C function)
 // the parameter param will be passed by the run-time
 // and it holds the thread structure defined below.
-typedef void* (*task_t)(buffer_t*);
+typedef void_func (*task_t)(buffer_t*);
 
 // the entry task should take event data as an argument.
-typedef void* (*entry_task_t)(buffer_t*, void* event);
+typedef void_func (*entry_task_t)(buffer_t*, void* event);
 
 // the main thread structure that holds all necessary info
 // to execute the computation represented by the wired
@@ -65,8 +67,8 @@ typedef void* (*entry_task_t)(buffer_t*, void* event);
 typedef struct {
     uint8_t priority; // thread priority (unique)
     volatile state_t state; // thread state
-    void* entry; // the first task to be executed
-    void* next; // the current task to be executed
+    void_func entry; // the first task to be executed
+    void_func next; // the current task to be executed
     buffer_t buffer; // holds task shared persistent variables
     uint16_t sing_timer; // holds the time when the thread will be executed
     uint16_t pdc_timer; // holds the time for "periodic" execution of the thread

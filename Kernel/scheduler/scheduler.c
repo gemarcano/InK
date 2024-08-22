@@ -57,13 +57,13 @@ void __scheduler_boot_init()
 
     for (i = MAX_THREADS; i > 0; i--) {
         // threads are not created yet
-        _threads[i].state == THREAD_STOPPED;
+        _threads[i].state = THREAD_STOPPED;
     }
     _sched_state = SCHED_SELECT;
 }
 
 // Assigns a slot to a thread. Should be called ONLY at the first system boot
-void __create_thread(uint8_t priority, void* entry, void* data_org,
+void __create_thread(uint8_t priority, void_func entry, void* data_org,
     void* data_temp, uint16_t size)
 {
     // init properties
@@ -188,6 +188,7 @@ void __scheduler_run()
             // after it has finished the execution of a single task
             _thread = __next_thread();
             _sched_state = SCHED_BUSY;
+            // fallthrough
         case SCHED_BUSY:
             // always execute the selected task to completion
             // execute one task inside the highest priority thread

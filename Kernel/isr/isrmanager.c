@@ -69,9 +69,11 @@ void __events_commit()
     case EVENT_INSERT:
         __perqueue_push(&_events[_thread->priority], &_event);
         _status = EVENT_COMMIT;
+        // fallthrough
     case EVENT_COMMIT:
         __perqueue_push_commit(&_events[_thread->priority]);
         _status = EVENT_SIGNAL;
+        // fallthrough
     case EVENT_SIGNAL:
         // if the thread is sleeping, activate it!
         if (_thread->state == THREAD_STOPPED) {
@@ -84,6 +86,7 @@ void __events_commit()
 // check if all slots are full or not
 uint8_t __event_buffer_full_ISR(thread_t* thread)
 {
+    // FIXME why is thread not used?
     return __perqueue_is_full(&_events[_thread->priority]);
 }
 
@@ -112,6 +115,7 @@ uint8_t __has_events(thread_t* thread)
 // We first pop an event and lock it
 isr_event_t* __lock_event(thread_t* thread)
 {
+    // FIXME why is thread not used?
     _popped[_thread->priority] = __perqueue_pop(&_events[_thread->priority]);
     return _popped[_thread->priority];
 }
@@ -119,6 +123,7 @@ isr_event_t* __lock_event(thread_t* thread)
 // Events should be released after lock
 void __release_event(thread_t* thread)
 {
+    // FIXME why is thread not used?
     __perqueue_pop_commit(&_events[_thread->priority]);
     _popped[_thread->priority] = NULL;
 }

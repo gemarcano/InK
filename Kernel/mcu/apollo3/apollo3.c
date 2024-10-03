@@ -60,11 +60,11 @@ void __mcu_init(void)
 
 void __mcu_sleep(void)
 {
+    // FIXME
 }
 
 void __enable_interrupt(void)
 {
-    // After basic init is done, enable interrupts
     am_hal_interrupt_master_enable();
 }
 

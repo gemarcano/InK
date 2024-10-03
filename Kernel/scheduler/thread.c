@@ -32,6 +32,8 @@
 
 #include "ink.h"
 
+#include <stddef.h>
+
 // prepares the stack of the thread for the task execution
 static inline void __prologue(thread_t* thread)
 {

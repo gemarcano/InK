@@ -33,10 +33,6 @@
 #ifndef INK_H_
 #define INK_H_
 
-#include <inttypes.h>
-#include <stdint.h>
-#include <stdlib.h>
-
 #include "channel/channel.h"
 #include "isr/isr.h"
 #include "mcu/mcu.h"
@@ -47,8 +43,11 @@
  * Module settings
  */
 
+// Define the WKUP_TIMER macro to enable wake-up timer support in InK.
 #define WKUP_TIMER
+// Define the XPR_TIMER macro to enable expiration timer support in InK.
 #define XPR_TIMER
+// Define the TIMERS_ON macro to timekeeping support in InK.
 #define TIMERS_ON
 
 #endif /* INK_H_ */

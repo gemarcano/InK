@@ -31,58 +31,53 @@
 #include "persistentqueue.h"
 #include "ink.h"
 
+#include <stdbool.h>
+#include <stddef.h>
+
 // inits the persistent queue
 void __perqueue_init(per_queue_t* queue)
 {
-    queue->_head ^= queue->_head;
-    queue->_tail ^= queue->_tail;
-    queue->__head ^= queue->__head;
-    queue->__tail ^= queue->__tail;
+    // Just zero-init everything in the queue
+    *queue = (per_queue_t) { 0 };
 }
 
-uint8_t __perqueue_is_empty(per_queue_t* queue)
+bool __perqueue_is_empty(const per_queue_t* queue)
 {
-    // if there is no event in the persistent queue
-    if (queue->_head == queue->_tail) {
-        return 1;
-    }
-
-    return 0;
+    return queue->_head == queue->_tail;
 }
 
-uint8_t __perqueue_is_full(per_queue_t* queue)
+bool __perqueue_is_full(const per_queue_t* queue)
 {
-    // use the temporary variable to calculate the next slot for the tail
-    queue->__tail = queue->_tail + 1;
-    if (queue->__tail == MAX_QUEUE_ITEMS) {
-        queue->__tail = 0;
+    // use a temporary variable to calculate the next slot for the tail
+    uint8_t tail = queue->_tail + 1;
+    if (tail == MAX_QUEUE_ITEMS + 1) {
+        tail = 0;
     }
 
     // check if all slots are full
-    if (queue->__tail == queue->_head) {
-        return 1;
-    }
-
-    return 0;
+    return tail == queue->_head;
 }
 
-uint8_t __perqueue_push(per_queue_t* queue, void* item)
+bool __perqueue_push(per_queue_t* queue, void* item)
 {
-    // use the temporary variable to calculate the next slot for the tail
-    queue->__tail = queue->_tail + 1;
-    if (queue->__tail == MAX_QUEUE_ITEMS)
-        queue->__tail = 0;
-    // if all slots are full, no way to register the interrupt! We loose one slot
+    // use a temporary variable to calculate the next slot for the tail
+    uint8_t tail = queue->_tail + 1;
+    if (tail == MAX_QUEUE_ITEMS + 1) {
+        tail = 0;
+    }
+    // if all slots are full, no way to register the interrupt! We lose one slot
     // with this check, but this allows us to update just one variable in the end
     // to insert the event: no need to keep track the number of inserted events!
-    if (queue->__tail == queue->_head) {
-        return 0;
+    if (tail == queue->_head) {
+        return false;
     }
 
     // copy the event to the event queue but do not modify the tail
     queue->_items[queue->_tail] = item;
+    // only modify the shadow/temp tail variable, in preparation for commit
+    queue->__tail = tail;
 
-    return 1;
+    return true;
 }
 
 /* commit the operation on the queue */
@@ -101,8 +96,9 @@ void* __perqueue_pop(per_queue_t* queue)
 
     // use the temporary variable to calculate the next slot for the tail
     queue->__head = queue->_head + 1;
-    if (queue->__head == MAX_QUEUE_ITEMS)
+    if (queue->__head == MAX_QUEUE_ITEMS + 1) {
         queue->__head = 0;
+    }
 
     return queue->_items[queue->_head];
 }

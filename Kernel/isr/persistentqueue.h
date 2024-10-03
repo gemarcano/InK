@@ -32,30 +32,95 @@
 #define COMM_PERSISTENTQUEUE_H_
 
 #include "isr.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 
 #define MAX_QUEUE_ITEMS MAX_PENDING_INTERRUPTS
 
-// a general persistent queue structure that works
-// via two-phase commit
+/** A general persistent queue structure that works via two-phase commit.
+ *
+ * Variables are atomic so that it is safe for an ISR or normal routines to
+ * modify them.
+ *
+ * It is intended that this structure is stored in non-volatile memory.
+ */
 typedef struct {
-    void* _items[MAX_QUEUE_ITEMS];
-    volatile uint8_t _head;
-    volatile uint8_t _tail;
+    // Content of the queue, pointers to data. A maximum of MAX_QUEUE_ITEMS can
+    // be accessed.
+    _Atomic(void*) _items[MAX_QUEUE_ITEMS + 1];
+    // The location of the first element in the queue.
+    _Atomic uint8_t _head;
+    // The location of one past the last element in the queue.
+    // When _head == _tail, the queue is empty.
+    _Atomic uint8_t _tail;
 
-    // for the consistent operations on the list
-    volatile uint8_t __head;
-    volatile uint8_t __tail;
+    // Shadow variable containing the uncommitted head
+    _Atomic uint8_t __head;
+    // Shadow variable containing the uncommitted head
+    _Atomic uint8_t __tail;
 } per_queue_t;
 
+/** Initializes the persistent queue.
+ *
+ * @param[out] queue Queue to initialize.
+ */
 void __perqueue_init(per_queue_t* queue);
-uint8_t __perqueue_is_empty(per_queue_t* queue);
-uint8_t __perqueue_is_full(per_queue_t* queue);
 
+/** Returns whether the queue is empty or not.
+ *
+ * @param[in] queue Queue to query.
+ *
+ * @returns True if the queue is empty, false otherwise.
+ */
+bool __perqueue_is_empty(const per_queue_t* queue);
+
+/** Returns whether the queue is full or not.
+ *
+ * @param[in] queue Queue to query.
+ *
+ * @returns True if the queue is full, false otherwise.
+ */
+bool __perqueue_is_full(const per_queue_t* queue);
+
+/** Gets an element from the queue and prepares it to be removed from the
+ * queue.
+ *
+ * The item returned, if any, is not yet removed from the queue. It is removed
+ * once the operation is committed.
+ *
+ * @param[in,out] queue Queue to extract an element from.
+ *
+ * @returns A pointer to the queue element.
+ */
 void* __perqueue_pop(per_queue_t* queue);
+
+/** Commits a pending queue pop.
+ *
+ * A pending pop operation is committed, effectively removing the element from
+ * the queue.
+ *
+ * @param[in,out] queue Queue to commit a recent pop.
+ */
 void __perqueue_pop_commit(per_queue_t* queue);
 
-uint8_t __perqueue_push(per_queue_t* queue, void* item);
+/** Pushes data onto the queue.
+ *
+ * This operation adds the item to the queue, but it isn't registered as being
+ * in the queue until it is committed.
+ *
+ * @param[in,out] queue Queue to push a pointer to.
+ * @param[in] item Item to add to the queue.
+ */
+bool __perqueue_push(per_queue_t* queue, void* item);
+
+/** Commits a pending queue push.
+ *
+ * A pending push operation is committed, effectively adding the element to the
+ * queue.
+ *
+ * @param[in,out] queue Queue to commit a recent push.
+ */
 void __perqueue_push_commit(per_queue_t* queue);
 
 #endif /* COMM_PERSISTENTQUEUE_H_ */

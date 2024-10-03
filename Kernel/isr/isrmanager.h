@@ -33,31 +33,97 @@
 
 #include <scheduler/scheduler.h>
 
+#include <stdbool.h>
+#include <stdint.h>
+
+/** Describes an event received by an ISR.
+ *
+ * All of the inner fields are atomic so that access to them both inside and
+ * outside of an ISR remains consistent.
+ */
 typedef struct {
-    void* data; // the data should be allocated in FRAM by the caller
-    uint32_t size; // size of the data buffer
-    uint32_t timestamp; // timestamp of the event
+    /// A pointer to the data associated with the event. This data should be
+    /// allocated in NVRAM by the caller
+    _Atomic(void*) data;
+    /// The size of the data in NVRAM.
+    _Atomic uint32_t size;
+    /// The timestamp of the event.
+    _Atomic uint32_t timestamp;
 } isr_event_t;
 
-// should be called from the first boot
-void __events_boot_init();
+/** Initializes MAX_THREADS event data structures, and clears all popped
+ * events. This must be called from a critical section.
+ *
+ * This must be called upon first boot.
+ */
+void __events_boot_init(void);
 
-// should be called at each reboot
-void __events_commit();
+/** Tries to commit an event on the current thread, if there's an ongoing
+ * event. This must be called from a critical section.
+ *
+ * An event is queued up for processing by calling `__event_signal_ISR`. Under
+ * normal operation, this function completes the following four stages:
+ *  1. Insert - The event is registered for processing. Data is inserted into
+ *              structures but not finalized.
+ *  2. Commit - The event is committed. Data storage is finalized and can now
+ *              be accessed.
+ *  3. Signal - Wakes up the thread to process the event.
+ *  4. Done   - The default state, nothing is going on.
+ *
+ * If interrupted (by power loss), calling this function restarts on the last
+ * stage not completed.
+ *
+ * This function should be called on reset.
+ */
+void __events_commit(void);
 
-// check if the thread has pending events
-uint8_t __has_events(thread_t* thread);
+/** Checks if the thread has pending events.
+ *
+ * @param[in,out] thread Pointer to thread to check if it has any events
+ *  pending.
+ *
+ * Returns True if there are pending events, false otherwise.
+ */
+bool __has_events(thread_t* thread);
 
-// We first pop an event and lock it
+/** Pops an event and locks it.
+ *
+ * FIXME how does any locking happen? What does locking even mean?
+ *
+ * @param[in,out] thread Pointer to thread to lock an event for.
+ *
+ * @returns The next event ready for procesing, if any.
+ */
 isr_event_t* __lock_event(thread_t* thread);
 
-// Events should be released after lock
+/** Releases an event after being locked.
+ *
+ * This commits the internal queue such that the event popped in `__lock_event`
+ * is finally removed from the queue.
+ *
+ * @param[in,out] thread Pointer to thread to release a previously locked event
+ *  for.
+ */
 void __release_event(thread_t* thread);
 
-// check if the thread event slots are not full
-uint8_t __event_buffer_full_ISR(thread_t* thread);
+/** Checks if the event slots are full for the given thread.
+ *
+ * This must be called from a cristical section or an ISR
+ *
+ * @param[in,out] thread The thread to check its event queue.
+ *
+ * @returns True if the event buffer/queue is full, false otherwise.
+ */
+bool __event_buffer_full_ISR(thread_t* thread);
 
-// signaling of the events from ISRs
+/** Queues an event up for the given thread.
+ *
+ * This must be called from a critical section or an ISR (usually an ISR, by
+ * using the __SIGNAL_EVENT macro).
+ *
+ * @param[in,out] thread The thread to queue up an event for.
+ * @param[in,out] event Event to queue up.
+ */
 void __event_signal_ISR(thread_t* thread, isr_event_t* event);
 
 #endif /* COMM_ISRMANAGER_H_ */

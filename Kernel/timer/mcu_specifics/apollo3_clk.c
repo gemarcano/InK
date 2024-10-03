@@ -33,7 +33,7 @@
 #include "persistent_timer_commit/persistent_timer.h"
 #include "timer.h"
 
-static __nv uint32_t current_ticks;
+static __nv volatile uint32_t current_ticks;
 
 // This is used by get_time
 static const am_hal_ctimer_config_t timer0_cfg = {
@@ -128,9 +128,15 @@ void set_timer_pdc(uint16_t ticks)
 
 void __setup_rtc()
 {
+    am_hal_rtc_osc_select(AM_HAL_RTC_OSC_XT);
+    am_hal_rtc_osc_enable();
+    am_hal_rtc_time_12hour(false);
 }
 
-static void time_handler(void) { }
+static void time_handler(void)
+{
+    current_ticks += 0x10000;
+}
 
 #ifdef WKUP_TIMER
 static void wake_handler(void);
@@ -161,6 +167,23 @@ void __setup_clock()
 
 uint32_t __get_rtc_time()
 {
+    am_hal_rtc_time_t time = { 0 };
+    am_hal_rtc_time_get(&time);
+
+    uint32_t result = 0;
+    result += time.ui32Hundredths * 10;
+    result += time.ui32Second * 1000;
+    result += time.ui32Minute * 1000 * 60;
+    result += time.ui32Hour * 1000 * 3600;
+    result += time.ui32DayOfMonth * 1000 * 3600;
+    uint32_t ui32Year;
+    uint32_t ui32Month;
+    uint32_t ui32DayOfMonth;
+    uint32_t ui32Hour;
+    uint32_t ui32Minute;
+    uint32_t ui32Second;
+    uint32_t ui32Hundredths;
+
     return 0; // FIXME
 }
 
@@ -291,8 +314,6 @@ static void periodic_handler(void)
 
 void am_ctimer_isr(void)
 {
-    // FIXME I need to differentiate between interrupts
-    current_ticks += 0x10000;
     uint32_t status = am_hal_ctimer_int_status_get(false);
     am_hal_ctimer_int_clear(status);
     am_hal_ctimer_int_service(status);

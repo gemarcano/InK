@@ -43,33 +43,49 @@ void __timers_init();
 void __reboot_timers();
 
 // WKUP timers
-// These timers are set to schedule an ISR for a specified time
-/*************************************************************************************************************/
+// These timers are set to schedule an ISR for a specified time to wake up the
+// MCU
+/******************************************************************************/
 
 /** Clears the status flag on wkup_d struct containing the thread/timing
  * information for the one shot timer
+ *
+ * FIXME This needs to be ISR safe.
  */
 void clear_wkup_status(uint8_t thread_id);
 
-// unload persistent buffer to local variables for fewer fram accesses
-void unpack_wkup_to_local();
+/** Unpacks persistent buffer from non-volatile memory to volatile memory.
+ *
+ * FIXME isn't this an abstraction leak? For example, this is useful on the
+ * MSP430 since FRAM access is much slower than SRAM, but that's not the case
+ * on the Apollo3.
+ *
+ * FIXME this needs to be ISR safe.
+ */
+void unpack_wkup_to_local(void);
 
-// updates the information on which thread is scheduled to execute next based on timing
-void refresh_wkup_timers();
+/** Updates the information on which thread is scheduled to execute next based
+ * on timing.
+ *
+ * FIXME this needs to be ISR safe.
+ */
+void refresh_wkup_timers(void);
 
-// sets a one-shot timer using Timer A2
+/** Sets a one-shot timer using the wake up timer.
+ */
 void set_wkup_timer(uint8_t thread_id, uint16_t ticks);
 
 // EXPR timers
 // These timers are set to schedule a time limit in the execution of a thread
-// The timer starts counting from the time initiated up to the specified amount of time,
-// if the time limit has been surpassed by a death event the thread is evicted from the
-// scheduler.
+// The timer starts counting from the time initiated up to the specified amount
+// of time, if the time limit has been surpassed by a death event the thread is
+// evicted from the scheduler.
 // The expiration counter is cleared by function call at a specified in the code.
-/*************************************************************************************************************/
+/******************************************************************************/
 void clear_xpr_status(uint8_t thread_id);
 
-// unload persistent buffer to local variables for fewer fram accesses
+/** Unpacks persistent buffer from non-volatile memory to volatile memory.
+ */
 void unpack_xpr_to_local();
 
 void refresh_xpr_timers();
@@ -88,7 +104,8 @@ uint8_t get_nxt_xpr(void);
 // scheduler.
 // The expiration counter is cleared by function call at a specified in the code.
 /*************************************************************************************************************/
-// unload persistent buffer to local variables for fewer fram accesses
+/** Unpacks persistent buffer from non-volatile memory to volatile memory.
+ */
 void unpack_pdc_to_local();
 
 // set a periodic firing of an event

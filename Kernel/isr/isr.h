@@ -38,11 +38,21 @@
 #include "isrmanager.h"
 #include "persistentqueue.h"
 
-// checks if the thread event slots are not full
+/** Checks if the thread event slots are full.
+ *
+ * See `__event_buffer_full_ISR` for more information.
+ *
+ * This must be called from a critical section.
+ */
 #define __EVENT_BUFFER_FULL(threadid) \
     __event_buffer_full_ISR(__get_thread(threadid))
 
-// signaling of the event from ISRs
+/** Signaling of the event from ISRs.
+ *
+ * See `__event_signal_ISR` for more information.
+ *
+ * This must be called from a critical section.
+ */
 #define __SIGNAL_EVENT(threadid, event) \
     __event_signal_ISR(__get_thread(threadid), event)
 

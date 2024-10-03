@@ -25,10 +25,6 @@
 #include "timer.h"
 #include "mcu_specifics/clk.h"
 #include "persistent_timer_commit/persistent_timer.h"
-// #include "persistent_timer.h"
-#define MAX_TIMED_THREADS 3
-#define MAX_XPR_THREADS 3
-#define MAX_PDC_THREADS 1
 
 // global
 // TODO:check if needed
@@ -42,14 +38,11 @@ static uint8_t nxt_xpr;
 static uint8_t nxt_pdc;
 static uint16_t min_pdc;
 
-// double buffer
-// 0 persistent - 1 dirty persistent
-extern pers_timer_t per_timer_vars[];
-
 // local, in RAM copies of the timer timing structures
-static timing_d wkup_timing[MAX_WKUP_THREADS];
-static timing_d xpr_timing[MAX_XPR_THREADS];
-static timing_d pdc_timing[MAX_PDC_THREADS];
+// non-volatile originals are kept by persistent_timer.c
+static timing_d_ wkup_timing[MAX_WKUP_THREADS];
+static timing_d_ xpr_timing[MAX_XPR_THREADS];
+static timing_d_ pdc_timing[MAX_PDC_THREADS];
 
 void __timers_init()
 {
@@ -117,25 +110,25 @@ void refresh_wkup_timers()
         if (wkup_timing[i].status == USED) {
 
             if (first) {
-                min_wkup = wkup_timing[i].data;
+                min_wkup = wkup_timing[i].time;
                 nxt_wkup = wkup_timing[i].thread_id;
                 first = 0;
             }
 
-            wkup_timing[i].data = wkup_timing[i].data - __get_time();
-            _pers_timer_update_data(i, WKUP, wkup_timing[i].data);
+            wkup_timing[i].time = wkup_timing[i].time - __get_time();
+            _pers_timer_update_data(i, WKUP, wkup_timing[i].time);
 
-            if (wkup_timing[i].data < 0 && wkup_timing[i].data > -tol) {
-                if ((min_wkup > -wkup_timing[i].data) || (min_wkup == -wkup_timing[i].data && nxt_wkup > wkup_timing[i].thread_id)) {
-                    min_wkup = -wkup_timing[i].data;
+            if (wkup_timing[i].time < 0 && wkup_timing[i].time > -tol) {
+                if ((min_wkup > -wkup_timing[i].time) || (min_wkup == -wkup_timing[i].time && nxt_wkup > wkup_timing[i].thread_id)) {
+                    min_wkup = -wkup_timing[i].time;
                     nxt_wkup = wkup_timing[i].thread_id;
                 }
-            } else if (wkup_timing[i].data < 0 && wkup_timing[i].data < -tol)
+            } else if (wkup_timing[i].time < 0 && wkup_timing[i].time < -tol)
                 wkup_timing[i].status = NOT_USED;
 
-            if (wkup_timing[i].data > 0) { // TODO:priority convention
-                if ((min_wkup > wkup_timing[i].data) || (min_wkup == wkup_timing[i].data && nxt_wkup > wkup_timing[i].thread_id)) {
-                    min_wkup = wkup_timing[i].data;
+            if (wkup_timing[i].time > 0) { // TODO:priority convention
+                if ((min_wkup > wkup_timing[i].time) || (min_wkup == wkup_timing[i].time && nxt_wkup > wkup_timing[i].thread_id)) {
+                    min_wkup = wkup_timing[i].time;
                     nxt_wkup = wkup_timing[i].thread_id;
                 }
             }
@@ -170,7 +163,7 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
     // set the compare register on the device
     for (uint8_t i = 0; i < MAX_WKUP_THREADS; i++) {
         if (wkup_timing[i].status == NOT_USED) {
-            wkup_timing[i].data = ticks;
+            wkup_timing[i].time = ticks;
             _pers_timer_update_data(i, WKUP, ticks);
             wkup_timing[i].thread_id = thread_id;
             _pers_timer_update_thread_id(i, WKUP, thread_id);
@@ -188,7 +181,7 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
         // FIXME why hardcoding 2 here? what if MAX_WKUP_THREADS is less than 3?
         // buffer is full
         // TODO: ADD failcheck
-        wkup_timing[2].data = ticks;
+        wkup_timing[2].time = ticks;
         wkup_timing[2].thread_id = thread_id;
         _pers_timer_update_data(2, WKUP, ticks);
         _pers_timer_update_thread_id(2, WKUP, thread_id);
@@ -237,15 +230,15 @@ void refresh_xpr_timers()
         if (xpr_timing[i].status == USED) {
 
             if (first) {
-                min_xpr = xpr_timing[i].data;
+                min_xpr = xpr_timing[i].time;
                 nxt_xpr = xpr_timing[i].thread_id;
                 first = 0;
             }
 
-            xpr_timing[i].data = xpr_timing[i].data - __get_time();
-            _pers_timer_update_data(i, XPR, xpr_timing[i].data);
+            xpr_timing[i].time = xpr_timing[i].time - __get_time();
+            _pers_timer_update_data(i, XPR, xpr_timing[i].time);
 
-            if (xpr_timing[i].data <= 0) {
+            if (xpr_timing[i].time <= 0) {
                 // evict thread
                 // TODO:fix bug to disable ISR
                 // TODO:find a more elegant way??
@@ -255,9 +248,9 @@ void refresh_xpr_timers()
                 clear_xpr_status(xpr_timing[i].thread_id);
             }
 
-            if (xpr_timing[i].data > 0) { // TODO:priority convention
-                if ((min_xpr > xpr_timing[i].data) || (min_xpr == xpr_timing[i].data && nxt_xpr < xpr_timing[i].thread_id)) {
-                    min_xpr = xpr_timing[i].data;
+            if (xpr_timing[i].time > 0) { // TODO:priority convention
+                if ((min_xpr > xpr_timing[i].time) || (min_xpr == xpr_timing[i].time && nxt_xpr < xpr_timing[i].thread_id)) {
+                    min_xpr = xpr_timing[i].time;
                     nxt_xpr = xpr_timing[i].thread_id;
                 }
             }
@@ -286,7 +279,7 @@ void set_expire_timer(uint8_t thread_id, uint32_t ticks)
 
     for (i = 0; i < MAX_XPR_THREADS; i++) {
         if (xpr_timing[i].status == NOT_USED) {
-            xpr_timing[i].data = ticks + __get_time();
+            xpr_timing[i].time = ticks + __get_time();
             _pers_timer_update_data(i, XPR, __get_time() + ticks);
             xpr_timing[i].thread_id = thread_id;
             _pers_timer_update_thread_id(i, XPR, thread_id);
@@ -364,7 +357,7 @@ void set_periodic_timer(uint8_t thread_id, uint16_t ticks)
             __set_pdc_timer(__get_thread(thread_id), ticks);
             __set_pdc_period(__get_thread(thread_id), 1);
             _pers_timer_update_data(i, PDC, ticks);
-            pdc_timing[i].data = ticks;
+            pdc_timing[i].time = ticks;
             _pers_timer_update_thread_id(i, PDC, thread_id);
             pdc_timing[i].thread_id = thread_id;
             _pers_timer_update_status(i, PDC, USED);
@@ -382,7 +375,7 @@ void set_periodic_timer(uint8_t thread_id, uint16_t ticks)
 
         // failure
         // TODO: ADD failcheck
-        pdc_timing[MAX_PDC_THREADS - 1].data = ticks;
+        pdc_timing[MAX_PDC_THREADS - 1].time = ticks;
         _pers_timer_update_data(MAX_PDC_THREADS - 1, PDC, ticks);
         pdc_timing[MAX_PDC_THREADS - 1].thread_id = thread_id;
         _pers_timer_update_thread_id(MAX_PDC_THREADS - 1, PDC, thread_id);
@@ -418,25 +411,25 @@ void refresh_pdc_timers()
         if (pdc_timing[i].status == USED) {
 
             if (first) {
-                min_pdc = pdc_timing[i].data;
+                min_pdc = pdc_timing[i].time;
                 nxt_pdc = pdc_timing[i].thread_id;
                 first = 0;
             }
 
-            pdc_timing[i].data = pdc_timing[i].data - __get_time();
-            _pers_timer_update_data(i, PDC, pdc_timing[i].data);
+            pdc_timing[i].time = pdc_timing[i].time - __get_time();
+            _pers_timer_update_data(i, PDC, pdc_timing[i].time);
 
-            if (pdc_timing[i].data < 0 && pdc_timing[i].data > -tol) {
-                if ((min_pdc > -pdc_timing[i].data) || (min_pdc == -pdc_timing[i].data && nxt_pdc > pdc_timing[i].thread_id)) {
-                    min_pdc = -pdc_timing[i].data;
+            if (pdc_timing[i].time < 0 && pdc_timing[i].time > -tol) {
+                if ((min_pdc > -pdc_timing[i].time) || (min_pdc == -pdc_timing[i].time && nxt_pdc > pdc_timing[i].thread_id)) {
+                    min_pdc = -pdc_timing[i].time;
                     nxt_pdc = pdc_timing[i].thread_id;
                 }
-            } else if (pdc_timing[i].data < 0 && pdc_timing[i].data < -tol)
+            } else if (pdc_timing[i].time < 0 && pdc_timing[i].time < -tol)
                 pdc_timing[i].status = NOT_USED;
 
-            if (pdc_timing[i].data > 0) { // TODO:priority convention
-                if ((min_pdc > pdc_timing[i].data) || (min_pdc == pdc_timing[i].data && nxt_pdc > pdc_timing[i].thread_id)) {
-                    min_pdc = pdc_timing[i].data;
+            if (pdc_timing[i].time > 0) { // TODO:priority convention
+                if ((min_pdc > pdc_timing[i].time) || (min_pdc == pdc_timing[i].time && nxt_pdc > pdc_timing[i].thread_id)) {
+                    min_pdc = pdc_timing[i].time;
                     nxt_pdc = pdc_timing[i].thread_id;
                 }
             }

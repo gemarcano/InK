@@ -43,6 +43,4 @@
 #error "Unknown compiler, unsure where to store non-volatile memory"
 #endif
 
-void __dma_copy(unsigned int from, unsigned int to, unsigned short size);
-
 #endif /* NV_H_ */

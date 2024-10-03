@@ -33,20 +33,42 @@
 
 #include "nv.h"
 
+/** Initializes the MCU.
+ *
+ * Prepares the MCU for operation, turning on and setting up the minimal amount
+ * of hardware required. This should always be called when the device is waking
+ * up.
+ */
 void __mcu_init(void);
+
+/** Puts the MCU to sleep.
+ *
+ * It should put the MCU to the lowest power level possible such that it can
+ * still be awoken by or process some interrupt.
+ */
 void __mcu_sleep(void);
 
+// These are some definitions provided by TI apparently, we're just making our
+// own wrappers for other platforms.
 #ifndef __ti__
+/** Enable global interrupts.
+ *
+ * FIXME any guarantees we should enforce? e.g. memory barriers?
+ */
 void __enable_interrupt(void);
+
+/** Disable global interrupts.
+ *
+ * FIXME any guarantees we should enforce? e.g. memory barriers?
+ */
 void __disable_interrupt(void);
 #endif
 
-/**
+/** Optimized routine to copy data words at a time.
  *
- * @param[in] from Address to start copy from
- * @param[out] to Address to copy to copy from
- * @param[in] size Number of words to copy
- *
+ * @param[in] from Address to start copy from.
+ * @param[out] to Address to copy to copy from.
+ * @param[in] size Number of words to copy.
  */
 void __fast_word_copy(void* from, void* to, unsigned short size);
 

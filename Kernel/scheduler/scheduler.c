@@ -34,6 +34,8 @@
 #include "ink.h"
 #include "priority.h"
 
+#include <stddef.h>
+
 // all threads in the system
 static __nv thread_t _threads[MAX_THREADS];
 

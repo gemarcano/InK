@@ -24,6 +24,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.//perssistent timers data
 #ifndef PERS_TMR_
 #define PERS_TMR_
+
 #include "ink.h"
 
 // how many timing Ink interfaces are used
@@ -33,75 +34,112 @@
 #define MAX_XPR_THREADS 3
 #define MAX_PDC_THREADS 1
 
-// TODO:make sure types are correctly used
-typedef enum { TIMER_INSERT,
-    TIMER_COMMIT,
-    TIMER_DONE } tmr_st;
+/// Represents whether a structure contains dirty data or not.
+typedef enum {
+    NOT_DIRTY,
+    DIRTY
+} dirty_st;
 
-typedef enum { NOT_DIRTY,
-    DIRTY } dirty_st;
+/// Represents whether a timer is in use or not.
+typedef enum {
+    NOT_USED,
+    USED
+} used_st;
 
-typedef enum { NOT_USED,
-    USED } used_st;
-
-typedef enum { WKUP,
+/// Represents the InK timer type.
+typedef enum {
+    WKUP,
     PDC,
-    XPR } ink_time_interface_t;
+    XPR
+} ink_time_interface_t;
 
-/**
- * Contains the timing data for each timer
+/** Contains the timing data for a timer.
  */
 typedef struct
 {
-    used_st status; /** USED - NOT_USED*/
-    uint8_t thread_id; /** thread ID*/
-    int32_t data; /** remaining time for thread execution*/
-    dirty_st __dirty; /** DIRTY - NOT_DIRTY*/
+    /// Indicates whether this timer is being used or not.
+    used_st status;
+    /// The unique thread ID that's using this timer.
+    uint8_t thread_id;
 
+    // FIXME why is this signed?
+    int32_t time; /** remaining time for thread execution*/
+} timing_d_;
+
+/** Holds both persistent and dirty timer structures.
+ */
+typedef struct
+{
+    timing_d_ persistent;
+    timing_d_ dirty;
+    /// Indicates whether or not there's pending data that needs to be
+    /// committed.
+    dirty_st state;
 } timing_d;
 
-/**
- * Contains the next thread to be executed persistent timer
+/** Contains the next thread to be executed persistent timer
  */
 typedef struct
 {
-    used_st status; /** USED - NOT_USED*/
-    uint8_t next_thread; /** next thread candidate*/
-    uint16_t next_time; /** next timing candidate*/
-    dirty_st __dirty; /** DIRTY - NOT_DIRTY*/
+    /// Whether the structure is in use or not.
+    used_st status;
+    /// The ID of the next thread candidate.
+    uint8_t next_thread;
+    /// The time the next thread candidate should run at (FIXME is this true?)
+    uint16_t next_time;
+} next_d_;
 
+/** Holds both persistent and dirty next thread structures.
+ */
+typedef struct
+{
+    next_d_ persistent;
+    next_d_ dirty;
+    dirty_st state;
 } next_d;
 
 /** Contains system on/off time.
- *
  */
 typedef struct
 {
-    uint16_t on_time; /**time the system has been on*/
-    uint16_t off_time; /** time the system has been off*/
-    dirty_st __dirty; /** DIRTY - NOT_DIRTY*/
+    /// The amount of time the system has been on (FIXME units?)
+    uint16_t on_time;
+    /// The amount of time the system has been off (FIXME units?)
+    uint16_t off_time;
+} pers_time_d_;
 
+/** Holds both persistent and dirty system time structures.
+ */
+typedef struct {
+    pers_time_d_ persistent;
+    pers_time_d_ dirty;
+    dirty_st state;
 } pers_time_d;
 
-/**
- * Contains timing data for WakeUp/Expiration/Periodic timer,
- * global time,and next thread to be fired by each timer.
- *
+/** Contains timing data for WakeUp/Expiration/Periodic timer, global time, and
+ * next thread to be fired by each timer.
  */
 typedef struct
 {
-    timing_d wkup_timing[MAX_WKUP_THREADS]; /**Timings for WakeUp timer*/
-    timing_d xpr_timing[MAX_XPR_THREADS]; /**Timings for Expiration timer*/
-    timing_d pdc_timing[MAX_PDC_THREADS]; /**Timings for Periodic timer*/
-    next_d next_info[TIMER_TOOLS]; /**Next time to be executed persistent timer*/
-    pers_time_d time_bank; /**Global time*/
+    /// Timing data for the wake-up timers.
+    timing_d wkup_timing[MAX_WKUP_THREADS];
+    /// Timing data for the expiration timers.
+    timing_d xpr_timing[MAX_XPR_THREADS];
+    /// Timing data for the periodic timers.
+    timing_d pdc_timing[MAX_PDC_THREADS];
+    /// Data on FIXME what are timer tools?
+    next_d next_info[TIMER_TOOLS];
+    /// Information about the global time on and off.
+    pers_time_d time_bank;
+} pers_timers_t;
 
-} pers_timer_t;
-
-/**
- * Initialize the buffers for holding timing information
+/** Initialize the persistent timers internal structures.
+ *
+ * This sets all of the structures ready for use, as in, marked as not in use.
+ * FIXME should anything else be cleared? Should this be called on all boots or
+ * just first boot?
  */
-void _pers_timer_init();
+void _pers_timer_init(void);
 
 /** Updates the time value of the specified timer.
  *
@@ -157,7 +195,7 @@ void _pers_timer_update_nxt_time(ink_time_interface_t interface, uint16_t next_t
  *
  * @return Timing information from the persistent buffer.
  */
-timing_d _pers_timer_get(uint8_t idx, ink_time_interface_t interface);
+timing_d_ _pers_timer_get(uint8_t idx, ink_time_interface_t interface);
 
 /** Get the timer data for the specified timer.
  *
@@ -210,19 +248,19 @@ uint8_t _pers_timer_get_nxt_thread(ink_time_interface_t interface);
  */
 uint16_t _pers_timer_get_nxt_time(ink_time_interface_t interface);
 
-// timer buffer is ready to commit
 /** Marks the specified timer as ready to be committed to non-volatile memory.
  *
+ * FIXME This needs to be safe for ISR use
  * FIXME nothing about this implementation actually uses the underlying variable as a lock...
  *
  * @param interface The type of the timer to mark as ready for commit.
  */
 void _pers_timer_update_lock(ink_time_interface_t interface);
 
-// commit into the persistent buffer
 /** Commits the memory of the specified timer to non-volatile memory.
  *
- * This only does something if the timer has been marked as ready for commit.
+ * FIXME Thids needs to be safe for ISR use
+ * This only does something if the timer has been previously locked.
  *
  * @param interface The type of the timer to commit.
  */

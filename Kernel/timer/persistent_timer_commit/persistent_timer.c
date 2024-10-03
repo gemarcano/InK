@@ -24,21 +24,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "persistent_timer.h"
 
-static volatile __nv tmr_st pdc_tstatus = TIMER_DONE; /**Initialize the Periodic state timer commit state machine */
-static volatile __nv tmr_st xpr_tstatus = TIMER_DONE; /**Initialize the Expire state timer commit state machine */
-static volatile __nv tmr_st wkup_tstatus = TIMER_DONE; /**Initialize the WakeUp state timer commit state machine */
+#include <stddef.h>
 
-// 0 persistent - 1 dirty persistent
-// double buffer
-__nv pers_timer_t pers_timer_vars[2];
+/// Used for the timer commit state machine
+typedef enum {
+    TIMER_DIRTY,
+    TIMER_CLEAN
+} tmr_st;
 
-void _pers_timer_init()
+static __nv _Atomic tmr_st pdc_tstatus = TIMER_CLEAN;
+static __nv _Atomic tmr_st xpr_tstatus = TIMER_CLEAN;
+static __nv _Atomic tmr_st wkup_tstatus = TIMER_CLEAN;
+
+// Represents all of the timer state and stores it in non-volatile memory.
+static __nv pers_timers_t pers_timers;
+
+void _pers_timer_init(void)
 {
-    uint8_t i;
-    for (i = 0; i < MAX_TIMED_THREADS; i++) {
-        pers_timer_vars[0].wkup_timing[i].status = NOT_USED;
-        pers_timer_vars[0].xpr_timing[i].status = NOT_USED;
-        pers_timer_vars[0].pdc_timing[i].status = NOT_USED;
+    for (uint8_t i = 0; i < MAX_TIMED_THREADS; i++) {
+        pers_timers.wkup_timing[i].persistent.status = NOT_USED;
+        pers_timers.xpr_timing[i].persistent.status = NOT_USED;
+        pers_timers.pdc_timing[i].persistent.status = NOT_USED;
     }
 }
 
@@ -47,18 +53,16 @@ void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface, uint32
     // update the persistent timer dirty buffer
     switch (interface) {
     case WKUP:
-        pers_timer_vars[1].wkup_timing[idx].data = time_data;
-        pers_timer_vars[1].wkup_timing[idx].__dirty = DIRTY;
+        pers_timers.wkup_timing[idx].dirty.time = time_data;
+        pers_timers.wkup_timing[idx].state = DIRTY;
         break;
     case XPR:
-        pers_timer_vars[1].xpr_timing[idx].data = time_data;
-        pers_timer_vars[1].xpr_timing[idx].__dirty = DIRTY;
-        return;
-    case PDC:
-        pers_timer_vars[1].pdc_timing[idx].data = time_data;
-        pers_timer_vars[1].pdc_timing[idx].__dirty = DIRTY;
+        pers_timers.xpr_timing[idx].dirty.time = time_data;
+        pers_timers.xpr_timing[idx].state = DIRTY;
         break;
-    default:
+    case PDC:
+        pers_timers.pdc_timing[idx].dirty.time = time_data;
+        pers_timers.pdc_timing[idx].state = DIRTY;
         break;
     }
 }
@@ -68,18 +72,16 @@ void _pers_timer_update_thread_id(uint8_t idx, ink_time_interface_t interface, u
     // update the persistent timer dirty buffer
     switch (interface) {
     case WKUP:
-        pers_timer_vars[1].wkup_timing[idx].thread_id = thread_id;
-        pers_timer_vars[1].wkup_timing[idx].__dirty = DIRTY;
+        pers_timers.wkup_timing[idx].dirty.thread_id = thread_id;
+        pers_timers.wkup_timing[idx].state = DIRTY;
         break;
     case XPR:
-        pers_timer_vars[1].xpr_timing[idx].thread_id = thread_id;
-        pers_timer_vars[1].xpr_timing[idx].__dirty = DIRTY;
+        pers_timers.xpr_timing[idx].dirty.thread_id = thread_id;
+        pers_timers.xpr_timing[idx].state = DIRTY;
         break;
     case PDC:
-        pers_timer_vars[1].pdc_timing[idx].thread_id = thread_id;
-        pers_timer_vars[1].pdc_timing[idx].__dirty = DIRTY;
-        break;
-    default:
+        pers_timers.pdc_timing[idx].dirty.thread_id = thread_id;
+        pers_timers.pdc_timing[idx].state = DIRTY;
         break;
     }
 }
@@ -89,18 +91,16 @@ void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface, used
     // update the persistent timer dirty buffer
     switch (interface) {
     case WKUP:
-        pers_timer_vars[1].wkup_timing[idx].status = status;
-        pers_timer_vars[1].wkup_timing[idx].__dirty = DIRTY;
+        pers_timers.wkup_timing[idx].dirty.status = status;
+        pers_timers.wkup_timing[idx].state = DIRTY;
         break;
     case XPR:
-        pers_timer_vars[1].xpr_timing[idx].status = status;
-        pers_timer_vars[1].xpr_timing[idx].__dirty = DIRTY;
+        pers_timers.xpr_timing[idx].dirty.status = status;
+        pers_timers.xpr_timing[idx].state = DIRTY;
         break;
     case PDC:
-        pers_timer_vars[1].pdc_timing[idx].status = status;
-        pers_timer_vars[1].pdc_timing[idx].__dirty = DIRTY;
-        break;
-    default:
+        pers_timers.pdc_timing[idx].dirty.status = status;
+        pers_timers.pdc_timing[idx].state = DIRTY;
         break;
     }
 }
@@ -108,15 +108,15 @@ void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface, used
 void _pers_timer_update_nxt_thread(ink_time_interface_t ink_time_interface, uint8_t next_thread)
 {
     // update the persistent timer dirty buffer
-    pers_timer_vars[1].next_info[ink_time_interface].next_thread = next_thread;
-    pers_timer_vars[1].next_info[ink_time_interface].__dirty = DIRTY;
+    pers_timers.next_info[ink_time_interface].dirty.next_thread = next_thread;
+    pers_timers.next_info[ink_time_interface].state = DIRTY;
 }
 
 void _pers_timer_update_nxt_time(ink_time_interface_t ink_time_interface, uint16_t next_time)
 {
     // update the persistent timer dirty buffer
-    pers_timer_vars[1].next_info[ink_time_interface].next_time = next_time;
-    pers_timer_vars[1].next_info[ink_time_interface].__dirty = DIRTY;
+    pers_timers.next_info[ink_time_interface].dirty.next_time = next_time;
+    pers_timers.next_info[ink_time_interface].state = DIRTY;
 }
 
 // timer buffer is ready to commit
@@ -124,15 +124,13 @@ void _pers_timer_update_lock(ink_time_interface_t interface)
 {
     switch (interface) {
     case WKUP:
-        wkup_tstatus = TIMER_COMMIT;
+        wkup_tstatus = TIMER_DIRTY;
         break;
     case XPR:
-        xpr_tstatus = TIMER_COMMIT;
+        xpr_tstatus = TIMER_DIRTY;
         break;
     case PDC:
-        pdc_tstatus = TIMER_COMMIT;
-        break;
-    default:
+        pdc_tstatus = TIMER_DIRTY;
         break;
     }
 }
@@ -141,45 +139,40 @@ void _pers_timer_update_lock(ink_time_interface_t interface)
 
 static void _commit_timer_buffers(ink_time_interface_t interface)
 {
-
-    uint8_t i;
-
     switch (interface) {
     case WKUP:
-        for (i = 0; i < MAX_WKUP_THREADS; i++) {
-            if (pers_timer_vars[1].wkup_timing[i].__dirty == DIRTY) {
+        for (uint8_t i = 0; i < MAX_WKUP_THREADS; i++) {
+            if (pers_timers.wkup_timing[i].state == DIRTY) {
 
-                pers_timer_vars[0].wkup_timing[i] = pers_timer_vars[1].wkup_timing[i];
-                pers_timer_vars[0].wkup_timing[i].__dirty = NOT_DIRTY;
+                pers_timers.wkup_timing[i].persistent = pers_timers.wkup_timing[i].dirty;
+                pers_timers.wkup_timing[i].state = NOT_DIRTY;
             }
         }
         break;
     case XPR:
-        for (i = 0; i < MAX_XPR_THREADS; i++) {
-            if (pers_timer_vars[1].xpr_timing[i].__dirty == DIRTY) {
+        for (uint8_t i = 0; i < MAX_XPR_THREADS; i++) {
+            if (pers_timers.xpr_timing[i].state == DIRTY) {
 
-                pers_timer_vars[0].xpr_timing[i] = pers_timer_vars[1].xpr_timing[i];
-                pers_timer_vars[0].xpr_timing[i].__dirty = NOT_DIRTY;
+                pers_timers.xpr_timing[i].persistent = pers_timers.xpr_timing[i].dirty;
+                pers_timers.xpr_timing[i].state = NOT_DIRTY;
             }
         }
         break;
     case PDC:
-        for (i = 0; i < MAX_PDC_THREADS; i++) {
-            if (pers_timer_vars[1].pdc_timing[i].__dirty == DIRTY) {
+        for (uint8_t i = 0; i < MAX_PDC_THREADS; i++) {
+            if (pers_timers.pdc_timing[i].state == DIRTY) {
 
-                pers_timer_vars[0].pdc_timing[i] = pers_timer_vars[1].pdc_timing[i];
-                pers_timer_vars[0].pdc_timing[i].__dirty = NOT_DIRTY;
+                pers_timers.pdc_timing[i].persistent = pers_timers.pdc_timing[i].dirty;
+                pers_timers.pdc_timing[i].state = NOT_DIRTY;
             }
         }
         break;
-    default:
-        break;
     }
 
-    for (i = 0; i < TIMER_TOOLS; i++) {
-        if (pers_timer_vars[1].next_info[interface].__dirty == DIRTY) {
-            pers_timer_vars[0].next_info[interface] = pers_timer_vars[1].next_info[interface];
-            pers_timer_vars[0].next_info[interface].__dirty = NOT_DIRTY;
+    for (uint8_t i = 0; i < TIMER_TOOLS; i++) {
+        if (pers_timers.next_info[interface].state == DIRTY) {
+            pers_timers.next_info[interface].persistent = pers_timers.next_info[interface].dirty;
+            pers_timers.next_info[interface].state = NOT_DIRTY;
         }
     }
 }
@@ -188,40 +181,37 @@ void _pers_timer_commit(ink_time_interface_t interface)
 {
     switch (interface) {
     case WKUP:
-        if (wkup_tstatus == TIMER_COMMIT) {
+        if (wkup_tstatus == TIMER_DIRTY) {
             _commit_timer_buffers(interface);
-            wkup_tstatus = TIMER_DONE;
+            wkup_tstatus = TIMER_CLEAN;
         }
         break;
     case XPR:
-        if (xpr_tstatus == TIMER_COMMIT) {
+        if (xpr_tstatus == TIMER_DIRTY) {
             _commit_timer_buffers(interface);
-            xpr_tstatus = TIMER_DONE;
+            xpr_tstatus = TIMER_CLEAN;
         }
         break;
     case PDC:
-        if (pdc_tstatus == TIMER_COMMIT) {
+        if (pdc_tstatus == TIMER_DIRTY) {
             _commit_timer_buffers(interface);
-            pdc_tstatus = TIMER_DONE;
+            pdc_tstatus = TIMER_CLEAN;
         }
-        break;
-    default:
         break;
     }
 }
 
-timing_d _pers_timer_get(uint8_t idx, ink_time_interface_t interface)
+timing_d_ _pers_timer_get(uint8_t idx, ink_time_interface_t interface)
 {
     switch (interface) {
     case WKUP:
-        return pers_timer_vars[0].wkup_timing[idx];
+        return pers_timers.wkup_timing[idx].persistent;
     case XPR:
-        return pers_timer_vars[0].xpr_timing[idx];
+        return pers_timers.xpr_timing[idx].persistent;
     case PDC:
-        return pers_timer_vars[0].pdc_timing[idx];
-    default:
-        return pers_timer_vars[0].wkup_timing[idx];
+        return pers_timers.pdc_timing[idx].persistent;
     }
+    unreachable();
 }
 
 uint16_t _pers_timer_get_data(uint8_t idx, ink_time_interface_t interface)
@@ -229,14 +219,13 @@ uint16_t _pers_timer_get_data(uint8_t idx, ink_time_interface_t interface)
     // get the persistent timer from persistent buffer
     switch (interface) {
     case WKUP:
-        return pers_timer_vars[0].wkup_timing[idx].data;
+        return pers_timers.wkup_timing[idx].persistent.time;
     case XPR:
-        return pers_timer_vars[0].xpr_timing[idx].data;
+        return pers_timers.xpr_timing[idx].persistent.time;
     case PDC:
-        return pers_timer_vars[0].pdc_timing[idx].data;
-    default:
-        return 0;
+        return pers_timers.pdc_timing[idx].persistent.time;
     }
+    unreachable();
 }
 
 uint8_t _pers_timer_get_thread_id(uint8_t idx, ink_time_interface_t interface)
@@ -244,14 +233,13 @@ uint8_t _pers_timer_get_thread_id(uint8_t idx, ink_time_interface_t interface)
     // get the persistent timer from persistent buffer
     switch (interface) {
     case WKUP:
-        return pers_timer_vars[0].wkup_timing[idx].thread_id;
+        return pers_timers.wkup_timing[idx].persistent.thread_id;
     case XPR:
-        return pers_timer_vars[0].xpr_timing[idx].thread_id;
+        return pers_timers.xpr_timing[idx].persistent.thread_id;
     case PDC:
-        return pers_timer_vars[0].pdc_timing[idx].thread_id;
-    default:
-        return 0;
+        return pers_timers.pdc_timing[idx].persistent.thread_id;
     }
+    unreachable();
 }
 
 used_st _pers_timer_get_status(uint8_t idx, ink_time_interface_t interface)
@@ -259,24 +247,23 @@ used_st _pers_timer_get_status(uint8_t idx, ink_time_interface_t interface)
     // get the persistent timer from persistent buffer
     switch (interface) {
     case WKUP:
-        return pers_timer_vars[0].wkup_timing[idx].status;
+        return pers_timers.wkup_timing[idx].persistent.status;
     case XPR:
-        return pers_timer_vars[0].xpr_timing[idx].status;
+        return pers_timers.xpr_timing[idx].persistent.status;
     case PDC:
-        return pers_timer_vars[0].pdc_timing[idx].status;
-    default:
-        return USED;
+        return pers_timers.pdc_timing[idx].persistent.status;
     }
+    unreachable();
 }
 // TODO: change types
 uint8_t _pers_timer_get_nxt_thread(ink_time_interface_t ink_time_interface)
 {
     // get the persistent timer from persistent buffer
-    return pers_timer_vars[0].next_info[ink_time_interface].next_thread;
+    return pers_timers.next_info[ink_time_interface].persistent.next_thread;
 }
 
 uint16_t _pers_timer_get_nxt_time(ink_time_interface_t ink_time_interface)
 {
     // get the persistent timer from persistent buffer
-    return pers_timer_vars[0].next_info[ink_time_interface].next_time;
+    return pers_timers.next_info[ink_time_interface].persistent.next_time;
 }

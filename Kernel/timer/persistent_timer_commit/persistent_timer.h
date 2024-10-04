@@ -58,12 +58,12 @@ typedef enum {
 typedef struct
 {
     /// Indicates whether this timer is being used or not.
-    used_st status;
+    _Atomic used_st status;
     /// The unique thread ID that's using this timer.
-    uint8_t thread_id;
+    _Atomic uint8_t thread_id;
 
     // FIXME why is this signed?
-    int32_t time; /** remaining time for thread execution*/
+    _Atomic int32_t time; /** remaining time for thread execution*/
 } timing_d_;
 
 /** Holds both persistent and dirty timer structures.
@@ -74,7 +74,7 @@ typedef struct
     timing_d_ dirty;
     /// Indicates whether or not there's pending data that needs to be
     /// committed.
-    dirty_st state;
+    _Atomic dirty_st state;
 } timing_d;
 
 /** Contains the next thread to be executed persistent timer
@@ -82,11 +82,11 @@ typedef struct
 typedef struct
 {
     /// Whether the structure is in use or not.
-    used_st status;
+    _Atomic used_st status;
     /// The ID of the next thread candidate.
-    uint8_t next_thread;
+    _Atomic uint8_t next_thread;
     /// The time the next thread candidate should run at (FIXME is this true?)
-    uint16_t next_time;
+    _Atomic uint16_t next_time;
 } next_d_;
 
 /** Holds both persistent and dirty next thread structures.
@@ -95,7 +95,7 @@ typedef struct
 {
     next_d_ persistent;
     next_d_ dirty;
-    dirty_st state;
+    _Atomic dirty_st state;
 } next_d;
 
 /** Contains system on/off time.
@@ -103,9 +103,9 @@ typedef struct
 typedef struct
 {
     /// The amount of time the system has been on (FIXME units?)
-    uint16_t on_time;
+    _Atomic uint16_t on_time;
     /// The amount of time the system has been off (FIXME units?)
-    uint16_t off_time;
+    _Atomic uint16_t off_time;
 } pers_time_d_;
 
 /** Holds both persistent and dirty system time structures.
@@ -113,7 +113,7 @@ typedef struct
 typedef struct {
     pers_time_d_ persistent;
     pers_time_d_ dirty;
-    dirty_st state;
+    _Atomic dirty_st state;
 } pers_time_d;
 
 /** Contains timing data for WakeUp/Expiration/Periodic timer, global time, and

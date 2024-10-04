@@ -56,4 +56,16 @@
 #define __SIGNAL_EVENT(threadid, event) \
     __event_signal_ISR(__get_thread(threadid), event)
 
+/** Enter a critical section.
+ *
+ * This stores the current interrupt state, and then disables all interrupts.
+ */
+void enter_critical_section(void);
+
+/** Exits a critical section.
+ *
+ * This restores the last known interrupt state.
+ */
+void exit_critical_section(void);
+
 #endif /* ISR_ISR_H_ */

@@ -33,7 +33,7 @@
 #include "persistent_timer_commit/persistent_timer.h"
 #include "timer.h"
 
-static __nv volatile uint32_t current_ticks;
+static __nv _Atomic uint32_t current_ticks;
 
 // This is used by get_time
 static const am_hal_ctimer_config_t timer0_cfg = {

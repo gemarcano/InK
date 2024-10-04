@@ -36,11 +36,11 @@
  *
  * Initializes the underlying persistent timers.
  */
-void __timers_init();
+void __timers_init(void);
 
 /** Commits pending updates to timers, refreshes their state, and commits that.
  */
-void __reboot_timers();
+void __reboot_timers(void);
 
 // WKUP timers
 // These timers are set to schedule an ISR for a specified time to wake up the

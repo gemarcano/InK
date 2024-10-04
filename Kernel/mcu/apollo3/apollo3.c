@@ -78,3 +78,17 @@ void __fast_word_copy(void* from, void* to, unsigned short size)
     // Apollo3 doesn't have general purposes DMA, so just use memcpy
     memcpy(to, from, size * sizeof(int));
 }
+
+static _Atomic uint32_t last_PRIMASK;
+
+void enter_critical_section(void)
+{
+    // copy current interrupt state
+    last_PRIMASK = __get_PRIMASK();
+    __set_PRIMASK(1);
+}
+
+void exit_critical_section(void)
+{
+    __set_PRIMASK(last_PRIMASK);
+}

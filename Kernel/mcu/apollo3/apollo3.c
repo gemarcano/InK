@@ -32,6 +32,8 @@
  *
  */
 
+#include <isr/isr.h>
+
 #include <asimple/systick.h>
 
 #include "am_bsp.h"
@@ -79,16 +81,15 @@ void __fast_word_copy(void* from, void* to, unsigned short size)
     memcpy(to, from, size * sizeof(int));
 }
 
-static _Atomic uint32_t last_PRIMASK;
-
-void enter_critical_section(void)
+void enter_critical_section(critical_section* section)
 {
     // copy current interrupt state
-    last_PRIMASK = __get_PRIMASK();
+    section->state = __get_PRIMASK();
     __set_PRIMASK(1);
 }
 
-void exit_critical_section(void)
+void exit_critical_section(critical_section* section)
 {
-    __set_PRIMASK(last_PRIMASK);
+    __set_PRIMASK(section->state);
+    section->state = 0;
 }

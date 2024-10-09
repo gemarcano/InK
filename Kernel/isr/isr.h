@@ -56,16 +56,34 @@
 #define __SIGNAL_EVENT(threadid, event) \
     __event_signal_ISR(__get_thread(threadid), event)
 
+/// Holds critical section state.
+typedef struct {
+    /// Holds interrupt state.
+    _Atomic uint32_t state;
+} critical_section;
+
 /** Enter a critical section.
  *
  * This stores the current interrupt state, and then disables all interrupts.
  */
-void enter_critical_section(void);
+void enter_critical_section(critical_section* section);
 
 /** Exits a critical section.
  *
  * This restores the last known interrupt state.
  */
-void exit_critical_section(void);
+void exit_critical_section(critical_section* section);
+
+/// Helper macro starting a critical section.
+#define ENTER_CRITICAL_SECTION() \
+    do {                         \
+        critical_section sec__;  \
+    enter_critical_section(&sec__)
+
+/// Helper macro exiting a critical section.
+#define EXIT_CRITICAL_SECTION()    \
+    exit_critical_section(&sec__); \
+    }                              \
+    while (0)
 
 #endif /* ISR_ISR_H_ */

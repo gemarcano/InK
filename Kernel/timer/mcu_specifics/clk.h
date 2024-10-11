@@ -26,43 +26,75 @@
 #define _CLK_H_
 #include "ink.h"
 
-// timer controls
-#ifdef TIMERS_ON
-#define UART_TIME 44
-#endif
-
 /** Starts the __get_time interface.
  *
  * This runs any initialization code required to make __get_time() function.
  *
  * As an example, for the MSP430 implementation, this initializes the RTC and
- * gets a timestamp from it, and starts the __get_time() dedicated timer.
+ * gets a timestamp from it to ensure the continuity of the internal time since
+ * boot, and starts the __get_time() dedicated timer.
  */
 void __get_time_init(void);
 
-/** Stops the __get_time interface
+/** Stops the __get_time interface.
+ *
+ * This stops any timers __get_time requires.
  */
 void __get_time_stop(void);
 
-/*
- * return current ticks + number of times the current timer has overflown
+/* Returns the time since first boot in milliseconds.
+ *
+ * FIXME at uint32_t, this overflows after 49 days... is that OK?
  */
 uint32_t __get_time(void);
 
+/** Sets up the RTC.
+ *
+ * Turns on any required peripherals to communicate with the RTC.
+ */
 void __setup_rtc(void);
 
+/** Sets up system clock.
+ *
+ * Sets up system clock frequency, and initializes anything needed to use the
+ * timers.
+ */
 void __setup_clock(void);
 
+/** Sets the Wakeup timer to fire in the given number of ticks.
+ *
+ * @param[in] ticks Number of ticks until timer fires.
+ */
 void set_timer_wkup(uint16_t ticks);
 
+/** Sets the Expiration timer to fire in the given number of ticks.
+ *
+ * @param[in] ticks Number of ticks until timer fires.
+ */
 void set_timer_xpr(uint16_t ticks);
 
+/** Sets the Periodic timer to fire in the given number of ticks.
+ *
+ * @param[in] ticks Number of ticks until timer fires.
+ */
 void set_timer_pdc(uint16_t ticks);
 
+/** Stops the Expiration timer.
+ *
+ * This resets the internal counter.
+ */
 void stop_timer_xpr(void);
 
+/** Stops the Wakeup timer.
+ *
+ * This resets the internal counter.
+ */
 void stop_timer_wkup(void);
 
+/** Stops the Periodic timer.
+ *
+ * This resets the internal counter.
+ */
 void stop_timer_pdc(void);
 
 #endif

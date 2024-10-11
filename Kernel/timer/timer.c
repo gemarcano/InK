@@ -188,10 +188,11 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
         // FIXME why hardcoding 2 here? what if MAX_WKUP_THREADS is less than 3?
         // buffer is full
         // TODO: ADD failcheck
-        wkup_timing[2].time = ticks;
-        wkup_timing[2].thread_id = thread_id;
-        _pers_timer_update_data(2, WKUP, ticks);
-        _pers_timer_update_thread_id(2, WKUP, thread_id);
+        // FIXME this looks like they're dropping the last entry and replacing it
+        wkup_timing[MAX_WKUP_THREADS - 1].time = ticks;
+        _pers_timer_update_data(MAX_WKUP_THREADS - 1, WKUP, ticks);
+        wkup_timing[MAX_WKUP_THREADS - 1].thread_id = thread_id;
+        _pers_timer_update_thread_id(MAX_WKUP_THREADS - 1, WKUP, thread_id);
         refresh_wkup_timers();
     }
 
@@ -311,7 +312,10 @@ void set_expire_timer(uint8_t thread_id, uint32_t ticks)
 
         // failure
         // TODO: ADD fail check
+        //
+        xpr_timing[MAX_XPR_THREADS - 1].time = ticks;
         _pers_timer_update_data(MAX_XPR_THREADS - 1, XPR, ticks);
+        xpr_timing[MAX_XPR_THREADS - 1].thread_id = thread_id;
         _pers_timer_update_thread_id(MAX_XPR_THREADS - 1, XPR, thread_id);
         refresh_xpr_timers();
     }

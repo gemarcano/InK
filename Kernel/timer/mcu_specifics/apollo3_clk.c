@@ -97,24 +97,6 @@ void set_timer_xpr(uint16_t ticks)
     am_hal_ctimer_int_enable(AM_HAL_CTIMER_INT_TIMERA2);
 }
 
-void stop_timer_xpr()
-{
-    am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA2);
-    am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA2);
-}
-
-void stop_timer_wkup()
-{
-    am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA1);
-    am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA1);
-}
-
-void stop_timer_pdc()
-{
-    am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA3);
-    am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA3);
-}
-
 void set_timer_pdc(uint16_t ticks)
 {
     am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA3);
@@ -126,8 +108,27 @@ void set_timer_pdc(uint16_t ticks)
     am_hal_ctimer_int_enable(AM_HAL_CTIMER_INT_TIMERA3);
 }
 
+void stop_timer_wkup()
+{
+    am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA1);
+    am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA1);
+}
+
+void stop_timer_xpr()
+{
+    am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA2);
+    am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA2);
+}
+
+void stop_timer_pdc()
+{
+    am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA3);
+    am_hal_ctimer_int_clear(AM_HAL_CTIMER_INT_TIMERA3);
+}
+
 void __setup_rtc()
 {
+    // FIXME is there anything needed to turn on the RTC hardware?
     am_hal_rtc_osc_select(AM_HAL_RTC_OSC_XT);
     am_hal_rtc_osc_enable();
     am_hal_rtc_time_12hour(false);
@@ -150,7 +151,7 @@ static void periodic_handler(void);
 
 void __setup_clock()
 {
-    // am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA0C0INT_Msk, )
+    // FIXME should I turn on timer hardware? Is there anything I need to do to turn it on?
     //  Clock System Setup
     am_hal_ctimer_int_register(CTIMER_INTEN_CTMRA0C0INT_Msk, time_handler);
 
@@ -176,15 +177,8 @@ uint32_t __get_rtc_time()
     result += time.ui32Minute * 1000 * 60;
     result += time.ui32Hour * 1000 * 3600;
     result += time.ui32DayOfMonth * 1000 * 3600;
-    uint32_t ui32Year;
-    uint32_t ui32Month;
-    uint32_t ui32DayOfMonth;
-    uint32_t ui32Hour;
-    uint32_t ui32Minute;
-    uint32_t ui32Second;
-    uint32_t ui32Hundredths;
 
-    return 0; // FIXME
+    return result;
 }
 
 /*

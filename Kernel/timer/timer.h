@@ -49,8 +49,6 @@ void __reboot_timers(void);
 
 /** Clears the status flag on wkup_d struct containing the thread/timing
  * information for the one shot timer
- *
- * FIXME This needs to be ISR safe.
  */
 void clear_wkup_status(uint8_t thread_id);
 
@@ -59,19 +57,18 @@ void clear_wkup_status(uint8_t thread_id);
  * FIXME isn't this an abstraction leak? For example, this is useful on the
  * MSP430 since FRAM access is much slower than SRAM, but that's not the case
  * on the Apollo3.
- *
- * FIXME this needs to be ISR safe.
  */
 void unpack_wkup_to_local(void);
 
 /** Updates the information on which thread is scheduled to execute next based
  * on timing.
- *
- * FIXME this needs to be ISR safe.
  */
 void refresh_wkup_timers(void);
 
 /** Sets a one-shot timer using the wake up timer.
+ *
+ * @param[in] thread_id Thread to run when the timer fires.
+ * @param[in] ticks Number of ticks until timer fires.
  */
 void set_wkup_timer(uint8_t thread_id, uint16_t ticks);
 
@@ -82,6 +79,10 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks);
 // evicted from the scheduler.
 // The expiration counter is cleared by function call at a specified in the code.
 /******************************************************************************/
+
+/** Clears the status flag on xpr_d struct containing the thread/timing
+ * information for the one shot timer
+ */
 void clear_xpr_status(uint8_t thread_id);
 
 /** Unpacks persistent buffer from non-volatile memory to volatile memory.

@@ -26,6 +26,11 @@
 #include "clk.h"
 #include "ink.h"
 
+// timer controls
+#ifdef TIMERS_ON
+#define UART_TIME 44
+#endif
+
 #define RTC 0x53
 #define RTC_LOW_REG 0x00
 #define RTC_CONF_REG 0x01

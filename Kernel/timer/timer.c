@@ -215,7 +215,6 @@ void clear_xpr_status(uint8_t thread_id)
         if (xpr_timing[i].thread_id == thread_id) {
             xpr_timing[i].status = NOT_USED;
             _pers_timer_update_status(i, XPR, NOT_USED);
-            break;
         }
     }
     EXIT_CRITICAL_SECTION();
@@ -484,7 +483,6 @@ void clear_pdc_status(uint8_t thread_id)
     ENTER_CRITICAL_SECTION();
     for (uint8_t i = 0; i < MAX_PDC_THREADS; i++) {
         if (pdc_timing[i].thread_id == thread_id) {
-
             pdc_timing[i].status = NOT_USED;
             _pers_timer_update_status(i, PDC, NOT_USED);
         }

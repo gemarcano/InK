@@ -46,8 +46,8 @@ typedef enum { TASK_READY = 1,
 // shared by the tasks it is encapsulating.
 typedef struct {
     void* buf[2]; // holds original and temporary stack pointers
-    volatile uint8_t idx; // index of the original buffer
-    volatile uint8_t _idx; // index of the new buffer
+    _Atomic uint8_t idx; // index of the original buffer
+    _Atomic uint8_t _idx; // index of the new buffer
     uint16_t size; // sizes of the buffers
 } buffer_t;
 
@@ -66,7 +66,7 @@ typedef void_func (*entry_task_t)(buffer_t*, void* event);
 // tasks
 typedef struct {
     uint8_t priority; // thread priority (unique)
-    volatile state_t state; // thread state
+    _Atomic state_t state; // thread state
     void_func entry; // the first task to be executed
     void_func next; // the current task to be executed
     buffer_t buffer; // holds task shared persistent variables

@@ -48,7 +48,7 @@ enum { SCHED_SELECT,
 // the id of the current thread being executed.
 static __nv thread_t* _thread = NULL;
 
-static volatile __nv uint8_t _sched_state = SCHED_SELECT;
+static _Atomic __nv uint8_t _sched_state = SCHED_SELECT;
 
 void __scheduler_boot_init()
 {

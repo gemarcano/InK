@@ -39,8 +39,8 @@
 #define NUM_PRIORITIES 64
 
 typedef struct {
-    volatile uint8_t _readyTable[NUM_PRIORITY_LEVEL];
-    volatile uint8_t _readyLevel;
+    _Atomic uint8_t _readyTable[NUM_PRIORITY_LEVEL];
+    _Atomic uint8_t _readyLevel;
 } priority_t;
 
 // priority queue operations

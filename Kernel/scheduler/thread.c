@@ -63,16 +63,16 @@ void __tick(thread_t* thread)
         buf = thread->buffer.buf[thread->buffer._idx ^ 1];
         // Check if it is the entry task. The entry task always
         // consumes an event in the event queue.
-        if (thread->next == thread->entry) {
+        if ((void_func)thread->next == (void_func)thread->entry) {
             // pop an event since the thread most probably woke up due to
             // an event
             isr_event_t* event = __lock_event(thread);
             // push event data to the entry task
-            thread->next = ((entry_task_t)thread->entry)(buf, (void*)event);
+            thread->next = (thread->entry)(buf, (void*)event);
             // the event should be released (deleted)
             thread->state = TASK_RELEASE_EVENT;
         } else {
-            thread->next = ((task_t)thread->next)(buf);
+            thread->next = (task_t)(thread->next)(buf);
             thread->state = TASK_FINISHED;
             break;
         }
@@ -99,7 +99,7 @@ void __tick(thread_t* thread)
                 __stop_thread(thread);
             } else {
                 // thread re-starts from the entry task
-                thread->next = thread->entry;
+                thread->next = (task_t)(void_func)thread->entry;
                 // ready to execute tasks again.
                 thread->state = TASK_READY;
             }

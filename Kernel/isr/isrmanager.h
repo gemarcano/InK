@@ -31,7 +31,9 @@
 #ifndef COMM_ISRMANAGER_H_
 #define COMM_ISRMANAGER_H_
 
-#include <scheduler/scheduler.h>
+// #include <scheduler/scheduler.h>
+
+#include <scheduler/thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -41,7 +43,7 @@
  * All of the inner fields are atomic so that access to them both inside and
  * outside of an ISR remains consistent.
  */
-typedef struct {
+typedef struct isr_event_t_ {
     /// A pointer to the data associated with the event. This data should be
     /// allocated in NVRAM by the caller
     _Atomic(void*) data;

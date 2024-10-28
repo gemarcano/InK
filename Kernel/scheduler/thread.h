@@ -56,10 +56,15 @@ typedef void (*void_func)(void);
 // the task definition (single C function)
 // the parameter param will be passed by the run-time
 // and it holds the thread structure defined below.
+// This really returns task_t, but C just can't describe that syntax...
 typedef void_func (*task_t)(buffer_t*);
 
+// type forward declaration, there's a circular dependency between thread.h and
+// isrmanager.h
+typedef struct isr_event_t_ isr_event_t;
+
 // the entry task should take event data as an argument.
-typedef void_func (*entry_task_t)(buffer_t*, void* event);
+typedef task_t (*entry_task_t)(buffer_t*, isr_event_t*);
 
 // the main thread structure that holds all necessary info
 // to execute the computation represented by the wired
@@ -67,8 +72,8 @@ typedef void_func (*entry_task_t)(buffer_t*, void* event);
 typedef struct {
     uint8_t priority; // thread priority (unique)
     _Atomic state_t state; // thread state
-    void_func entry; // the first task to be executed
-    void_func next; // the current task to be executed
+    entry_task_t entry; // the first task to be executed
+    task_t next; // the current task to be executed
     buffer_t buffer; // holds task shared persistent variables
     uint16_t sing_timer; // holds the time when the thread will be executed
     uint16_t pdc_timer; // holds the time for "periodic" execution of the thread
@@ -77,11 +82,11 @@ typedef struct {
 } thread_t;
 
 // allocates a double buffer for the persistent variables in FRAM
-#define __shared(...)                          \
-    typedef struct {                           \
-        __VA_ARGS__                            \
-    } FRAM_data_t __attribute__((aligned(2))); \
-    static __nv FRAM_data_t __persistent_vars[2];
+#define __shared(...)                                 \
+    typedef struct {                                  \
+        __VA_ARGS__                                   \
+    } nonvolatile_data_t __attribute__((aligned(2))); \
+    static __nv nonvolatile_data_t __persistent_vars[2];
 
 // runs one task inside the current thread.
 void __tick(thread_t* thread);

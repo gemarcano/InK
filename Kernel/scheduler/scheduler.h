@@ -42,7 +42,7 @@
 
 void __scheduler_boot_init();
 void __scheduler_run();
-void __create_thread(uint8_t priority, void_func entry, void* data_org,
+void __create_thread(uint8_t priority, entry_task_t entry, void* data_org,
     void* data_temp, uint16_t size);
 
 // restart thread

@@ -40,14 +40,21 @@ static timing_d_ wkup_timing[MAX_WKUP_THREADS];
 static timing_d_ xpr_timing[MAX_XPR_THREADS];
 static timing_d_ pdc_timing[MAX_PDC_THREADS];
 
-void __timers_init()
+void __timers_boot_init(void)
 {
     ENTER_CRITICAL_SECTION();
-    _pers_timer_init();
+    _pers_timer_boot_init();
     EXIT_CRITICAL_SECTION();
+    __clk_boot_init();
+    __timers_init();
 }
 
-void __reboot_timers()
+void __timers_init(void)
+{
+    __get_time_init();
+}
+
+void __reboot_timers(void)
 {
 
     ENTER_CRITICAL_SECTION();

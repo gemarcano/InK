@@ -75,6 +75,11 @@ static const am_hal_ctimer_config_t timer3_cfg = {
     0,
 };
 
+void __clk_boot_init(void)
+{
+    current_ticks = 0;
+}
+
 void set_timer_wkup(uint16_t ticks)
 {
     am_hal_ctimer_int_disable(AM_HAL_CTIMER_INT_TIMERA1);

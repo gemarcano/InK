@@ -27,7 +27,9 @@
 #include <mcu.h>
 
 // indicates if this is the first boot.
-__nv uint8_t __inited = 0;
+// This variable is _special_. It MUST be set to zero by something else outside
+// of InK.
+static volatile __nv uint32_t __inited;
 
 // global time in ticks
 extern uint32_t current_ticks;
@@ -37,30 +39,31 @@ extern uint32_t current_ticks;
 extern void __app_init();
 extern void __app_reboot();
 
+#define RANDOM_INIT_VALUE (0x00C32EAA)
+
 int main(void)
 {
     // always init microcontroller
     __mcu_init();
 
     // if this is the first boot
-    if (!__inited) {
+    if (__inited != RANDOM_INIT_VALUE) {
         // init the scheduler state
         __scheduler_boot_init();
         // init the event handler
         __events_boot_init();
 #ifdef TIMERS_ON
-        __get_time_init();
         // init the timers
-        __timers_init();
+        __timers_boot_init();
 #endif
         // init the applications
         __app_init();
         // the first and initial boot is finished
-        __inited = 1;
+        __inited = RANDOM_INIT_VALUE;
     }
 #ifdef TIMERS_ON
     else {
-        __get_time_init();
+        __timers_init();
     }
 #endif
 

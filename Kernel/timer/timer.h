@@ -25,16 +25,19 @@
 #ifndef INC_TMR_
 #define INC_TMR_
 
-// persistent timers "emulation"
-// TODO:Fix that
-// typedef uint16_t __pers_time_t;
-//
-//
-#include "mcu_specifics/clk.h"
+#include <stdint.h>
 
-/** Initialize the timer subsystem.
+/** Initialize the timer on first boot.
  *
- * Initializes the underlying persistent timers.
+ * This initializes any nonvolatile storage to defaults.
+ *
+ * Initializes the underlying persistent timers, and the RTC.
+ */
+void __timers_boot_init(void);
+
+/** Initializes the timers on a non-first init.
+ *
+ * Initializes the RTC.
  */
 void __timers_init(void);
 

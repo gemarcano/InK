@@ -40,7 +40,7 @@ enum event_status : uint8_t { EVENT_INSERT,
     EVENT_DONE };
 
 // The current event status state
-static __nv _Atomic enum event_status _status = EVENT_DONE;
+static __nv _Atomic enum event_status _status;
 
 // keep track of the current event insertion
 static __nv _Atomic(thread_t*) _thread;
@@ -55,6 +55,8 @@ static __nv isr_event_t* _popped[MAX_THREADS];
 // should be called at the first boot only
 void __events_boot_init(void)
 {
+    _status = EVENT_DONE;
+    _thread = NULL;
     for (uint8_t i = 0; i < MAX_THREADS; ++i) {
         // initialize each queue
         __perqueue_init(&_events[i]);

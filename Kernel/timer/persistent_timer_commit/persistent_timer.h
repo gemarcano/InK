@@ -139,7 +139,7 @@ typedef struct
  * FIXME should anything else be cleared? Should this be called on all boots or
  * just first boot?
  */
-void _pers_timer_init(void);
+void _pers_timer_boot_init(void);
 
 /** Updates the time value of the specified timer.
  *

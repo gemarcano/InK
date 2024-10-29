@@ -39,7 +39,7 @@ static __nv _Atomic tmr_st wkup_tstatus = TIMER_CLEAN;
 // Represents all of the timer state and stores it in non-volatile memory.
 static __nv pers_timers_t pers_timers;
 
-void _pers_timer_init(void)
+void _pers_timer_boot_init(void)
 {
     for (uint8_t i = 0; i < MAX_TIMED_THREADS; i++) {
         pers_timers.wkup_timing[i].persistent.status = NOT_USED;

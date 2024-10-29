@@ -46,18 +46,18 @@ enum { SCHED_SELECT,
     SCHED_BUSY };
 
 // the id of the current thread being executed.
-static __nv thread_t* _thread = NULL;
+static __nv thread_t* _thread;
 
-static _Atomic __nv uint8_t _sched_state = SCHED_SELECT;
+static _Atomic __nv uint8_t _sched_state;
 
 void __scheduler_boot_init()
 {
-    uint8_t i;
+    _thread = NULL;
 
     // clear priority variables for the threads
     __priority_init(&_priorities);
 
-    for (i = MAX_THREADS; i > 0; i--) {
+    for (uint8_t i = MAX_THREADS; i > 0; i--) {
         // threads are not created yet
         _threads[i].state = THREAD_STOPPED;
     }

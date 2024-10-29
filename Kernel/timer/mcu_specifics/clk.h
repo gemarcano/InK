@@ -26,6 +26,10 @@
 #define _CLK_H_
 #include "ink.h"
 
+/** Runs any initialization that must only occur during first boot.
+ */
+void __clk_boot_init(void);
+
 /** Starts the __get_time interface.
  *
  * This runs any initialization code required to make __get_time() function.

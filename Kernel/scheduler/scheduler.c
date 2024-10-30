@@ -66,7 +66,7 @@ void __scheduler_boot_init()
 
 // Assigns a slot to a thread. Should be called ONLY at the first system boot
 void __create_thread(uint8_t priority, entry_task_t entry, void* data_org,
-    void* data_temp, uint16_t size)
+    void* data_temp, size_t size)
 {
     // init properties
     _threads[priority].priority = priority;
@@ -75,9 +75,10 @@ void __create_thread(uint8_t priority, entry_task_t entry, void* data_org,
     _threads[priority].state = THREAD_STOPPED;
 
     // init shared buffer
-    _threads[priority].buffer.buf[0] = data_org;
-    _threads[priority].buffer.buf[1] = data_temp;
+    _threads[priority].buffer.shared_data[0] = data_org;
+    _threads[priority].buffer.shared_data[1] = data_temp;
     _threads[priority].buffer.idx = 0;
+    _threads[priority].buffer._idx = 1;
     _threads[priority].buffer.size = size;
 }
 

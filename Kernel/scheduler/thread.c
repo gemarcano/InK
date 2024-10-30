@@ -34,33 +34,22 @@
 
 #include <stddef.h>
 
-// prepares the stack of the thread for the task execution
-static inline void __prologue(thread_t* thread)
-{
-    buffer_t* buffer = &thread->buffer;
-#ifdef RAISE_PIN
-    __port_on(3, 6);
-#endif
-    // copy original stack to the temporary stack
-    __fast_word_copy(buffer->buf[buffer->idx], buffer->buf[buffer->idx ^ 1], buffer->size >> 1);
-#ifdef RAISE_PIN
-    __port_off(3, 6);
-#endif
-}
-
 // runs one task inside the current thread
 void __tick(thread_t* thread)
 {
-    void* buf;
     switch (thread->state) {
-    case TASK_READY:
-#ifdef RAISE_PIN
-        __port_off(3, 5);
-#endif
-        // refresh thread stack
-        __prologue(thread);
-        // get thread buffer
-        buf = thread->buffer.buf[thread->buffer._idx ^ 1];
+    case TASK_READY: {
+        // Make 2-phase commit temporary index point to scratch shared_data
+        thread->buffer._idx = thread->buffer.idx ^ 1;
+
+        // refresh thread shared data
+        __fast_word_copy(
+            thread->buffer.shared_data[thread->buffer.idx],
+            thread->buffer.shared_data[thread->buffer._idx],
+            thread->buffer.size);
+
+        // get the inactive shared data
+        void* buf = thread->buffer.shared_data[thread->buffer._idx];
         // Check if it is the entry task. The entry task always
         // consumes an event in the event queue.
         if ((void_func)thread->next == (void_func)thread->entry) {
@@ -68,7 +57,7 @@ void __tick(thread_t* thread)
             // an event
             isr_event_t* event = __lock_event(thread);
             // push event data to the entry task
-            thread->next = (thread->entry)(buf, (void*)event);
+            thread->next = (thread->entry)(buf, event);
             // the event should be released (deleted)
             thread->state = TASK_RELEASE_EVENT;
         } else {
@@ -76,6 +65,7 @@ void __tick(thread_t* thread)
             thread->state = TASK_FINISHED;
             break;
         }
+    }
         // fallthrough
     case TASK_RELEASE_EVENT:
         // release any event which is popped by the task
@@ -84,7 +74,6 @@ void __tick(thread_t* thread)
         // fallthrough
     case TASK_FINISHED:
         // switch stack index to commit changes
-        thread->buffer._idx = thread->buffer.idx ^ 1;
         thread->state = TASK_COMMIT;
         // fallthrough
     case TASK_COMMIT:

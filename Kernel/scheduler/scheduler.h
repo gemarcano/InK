@@ -36,14 +36,24 @@
 #include "task.h"
 #include "thread.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define MAX_THREADS NUM_PRIORITIES
 
-void __scheduler_boot_init();
-void __scheduler_run();
+void __scheduler_boot_init(void);
+void __scheduler_run(void);
+
+/** Creates a new thread.
+ *
+ * @param[in] priority
+ * @param[in] entry
+ * @param[in,out] data_org
+ * @param[in,out] data_temp
+ * @param[in] size size of the struct backing data_org and data_temp
+ */
 void __create_thread(uint8_t priority, entry_task_t entry, void* data_org,
-    void* data_temp, uint16_t size);
+    void* data_temp, size_t size);
 
 // restart thread
 void __start_thread(thread_t* thread);

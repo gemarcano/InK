@@ -31,8 +31,10 @@
 
 // size should be in words
 
-void __fast_word_copy(void* from, void* to, unsigned short size)
+void __fast_word_copy(void* from, void* to, size_t size)
 {
+    // DMA only understands words
+    size = size / 2;
     // Configure DMA channel 0
     __data16_write_addr((unsigned short)&DMA0SA, (unsigned long)from);
     // Source block address

@@ -32,6 +32,7 @@
 #define MCU_H_
 
 #include "nv.h"
+#include <stddef.h>
 
 /** Initializes the MCU.
  *
@@ -66,10 +67,12 @@ void __disable_interrupt(void);
 
 /** Optimized routine to copy data words at a time.
  *
+ * The size provided must be a multiple of the word size for the platform.
+ *
  * @param[in] from Address to start copy from.
  * @param[out] to Address to copy to copy from.
- * @param[in] size Number of words to copy.
+ * @param[in] size Number of bytes to copy.
  */
-void __fast_word_copy(void* from, void* to, unsigned short size);
+void __fast_word_copy(const void* from, void* to, size_t size);
 
 #endif /* MCU_H_ */

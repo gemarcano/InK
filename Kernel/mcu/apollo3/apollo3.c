@@ -40,6 +40,7 @@
 #include "am_mcu_apollo.h"
 #include "am_util.h"
 
+#include <stdint.h>
 #include <string.h>
 
 void __mcu_init(void)
@@ -75,10 +76,10 @@ void __disable_interrupt(void)
     am_hal_interrupt_master_disable();
 }
 
-void __fast_word_copy(void* from, void* to, unsigned short size)
+void __fast_word_copy(const void* from, void* to, size_t size)
 {
     // Apollo3 doesn't have general purposes DMA, so just use memcpy
-    memcpy(to, from, size * sizeof(int));
+    memcpy(to, from, size);
 }
 
 void enter_critical_section(critical_section* section)

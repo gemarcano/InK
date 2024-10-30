@@ -33,6 +33,7 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
+#include <stddef.h>
 #include <stdint.h>
 
 // the state of the threads
@@ -45,10 +46,16 @@ typedef enum { TASK_READY = 1,
 // each thread will hold the double buffer for the variables
 // shared by the tasks it is encapsulating.
 typedef struct {
-    void* buf[2]; // holds original and temporary stack pointers
-    _Atomic uint8_t idx; // index of the original buffer
-    _Atomic uint8_t _idx; // index of the new buffer
-    uint16_t size; // sizes of the buffers
+    // holds pointers to the active and inactive shared non-volatile data
+    // The actual type is dependent on the __shared data used by the thread
+    // owning this buffer.
+    void* shared_data[2];
+    // Index of the currently valid shared data
+    _Atomic uint8_t idx;
+    // Temporary index, used for 2-phase commit
+    _Atomic uint8_t _idx;
+    // Size of the data pointed to by each shared_data index
+    size_t size;
 } buffer_t;
 
 typedef void (*void_func)(void);
@@ -57,14 +64,14 @@ typedef void (*void_func)(void);
 // the parameter param will be passed by the run-time
 // and it holds the thread structure defined below.
 // This really returns task_t, but C just can't describe that syntax...
-typedef void_func (*task_t)(buffer_t*);
+typedef void_func (*task_t)(void*);
 
 // type forward declaration, there's a circular dependency between thread.h and
 // isrmanager.h
 typedef struct isr_event_t_ isr_event_t;
 
 // the entry task should take event data as an argument.
-typedef task_t (*entry_task_t)(buffer_t*, isr_event_t*);
+typedef task_t (*entry_task_t)(void*, isr_event_t*);
 
 // the main thread structure that holds all necessary info
 // to execute the computation represented by the wired
@@ -81,12 +88,14 @@ typedef struct {
     uint16_t pdc_period; // holds the current period
 } thread_t;
 
-// allocates a double buffer for the persistent variables in FRAM
-#define __shared(...)                                 \
-    typedef struct {                                  \
-        __VA_ARGS__                                   \
-    } nonvolatile_data_t __attribute__((aligned(2))); \
-    static __nv nonvolatile_data_t __persistent_vars[2];
+// allocates a double buffer for the persistent variables in non-volatile
+// memory. There can only be one of these per translation unit. Also, The data
+// is not shared across translation units, even if this is called in a header.
+#define __shared(...)                                            \
+    typedef struct {                                             \
+        __VA_ARGS__                                              \
+    } non_volatile_data_t __attribute__((aligned(sizeof(int)))); \
+    static __nv non_volatile_data_t __persistent_vars[2];
 
 // runs one task inside the current thread.
 void __tick(thread_t* thread);

@@ -91,11 +91,12 @@ typedef struct {
 // allocates a double buffer for the persistent variables in non-volatile
 // memory. There can only be one of these per translation unit. Also, The data
 // is not shared across translation units, even if this is called in a header.
-#define __shared(...)                                            \
-    typedef struct {                                             \
-        __VA_ARGS__                                              \
-    } non_volatile_data_t __attribute__((aligned(sizeof(int)))); \
-    static __nv non_volatile_data_t __persistent_vars[2];
+#define __shared(first, ...)        \
+    typedef struct {                \
+        _Alignas(sizeof(int)) first \
+            __VA_ARGS__             \
+    } non_volatile_data_t;          \
+    static __nv non_volatile_data_t __persistent_vars[2]
 
 // runs one task inside the current thread.
 void __tick(thread_t* thread);

@@ -34,35 +34,34 @@
 #include <stddef.h>
 
 __shared(
-    uint16_t counter;)
+    uint16_t counter;);
 
-    // Define two tasks
-    ENTRY_TASK(task1);
+// Define two tasks
+ENTRY_TASK(task1);
 TASK(task2);
 
-void thread1_init()
+void thread1_init(void)
 {
     // create a thread with priority " " and entry task task1
     __CREATE(THREAD1, task1);
     __SIGNAL(THREAD1);
 }
 
-void __app_reboot()
+void __app_reboot(void)
 {
 }
 
-uint16_t counter;
 ENTRY_TASK(task1)
 {
-    counter++;
+    __SET(counter, __GET(counter) + 1);
     // Returns next task to run
     return (task_t)task2;
 }
 
 TASK(task2)
 {
-
+    __GET(counter);
     // This re-queues THREAD1 to re-run
     __SIGNAL(THREAD1);
-    return NULL;
+    return task1;
 }

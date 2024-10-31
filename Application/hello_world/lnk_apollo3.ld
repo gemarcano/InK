@@ -43,7 +43,7 @@ SECTIONS
     _etext = .;
   } > flash
 
-  .nv_vars :
+  .nv_vars (NOLOAD) :
   {
 	. = ALIGN(4);
 	_nv = .;

@@ -39,7 +39,7 @@ bin = custom_target('hello_world_ink' + '.bin',
 svl_tools = find_program('svl-tools')
 
 run_target('flash',
-  command : [svl_tools, 'flash', '-p', get_option('tty'), '-f',
-    meson.project_name() + '.bin', '-b', '921600', '-v'],
+  command : [svl_tools, '-v', '-p', get_option('tty'), '-b', '921600', 'flash', '-f',
+    meson.project_name() + '.bin'],
   depends : bin,
 )

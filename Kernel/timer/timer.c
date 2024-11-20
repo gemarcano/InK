@@ -36,9 +36,9 @@ static _Atomic uint8_t nxt_pdc;
 
 // local, in RAM copies of the timer timing structures
 // non-volatile originals are kept by persistent_timer.c
-static timing_d_ wkup_timing[MAX_WKUP_THREADS];
-static timing_d_ xpr_timing[MAX_XPR_THREADS];
-static timing_d_ pdc_timing[MAX_PDC_THREADS];
+static timing_d_data wkup_timing[MAX_WKUP_THREADS];
+static timing_d_data xpr_timing[MAX_XPR_THREADS];
+static timing_d_data pdc_timing[MAX_PDC_THREADS];
 
 void __timers_boot_init(void)
 {
@@ -93,7 +93,7 @@ void clear_wkup_status(uint8_t thread_id)
     for (uint8_t i = 0; i < MAX_WKUP_THREADS; i++) {
         if (wkup_timing[i].thread_id == thread_id) {
             wkup_timing[i].status = NOT_USED;
-            _pers_timer_update_status(i, WKUP, NOT_USED);
+            _pers_timer_update_data(i, WKUP, &wkup_timing[i]);
         }
     }
     EXIT_CRITICAL_SECTION();
@@ -127,7 +127,7 @@ void refresh_wkup_timers()
             }
 
             wkup_timing[i].time = wkup_timing[i].time - __get_time();
-            _pers_timer_update_data(i, WKUP, wkup_timing[i].time);
+            _pers_timer_update_data(i, WKUP, &wkup_timing[i]);
 
             if (wkup_timing[i].time < 0 && wkup_timing[i].time > -tol) {
                 if ((min_wkup > -wkup_timing[i].time) || (min_wkup == -wkup_timing[i].time && nxt_wkup > wkup_timing[i].thread_id)) {
@@ -147,8 +147,11 @@ void refresh_wkup_timers()
     }
 
     if (!first) {
-        _pers_timer_update_nxt_thread(WKUP, nxt_wkup);
-        _pers_timer_update_nxt_time(WKUP, min_wkup);
+        next_d_data next = {
+            .next_thread = nxt_wkup,
+            .next_time = min_wkup,
+        };
+        _pers_timer_update_nxt_thread(WKUP, &next);
         // set the new pending ISR timer.
         // TODO:set correct CLK
         // timerA2_set_CCR0(min_wkup);
@@ -178,11 +181,9 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
     for (uint8_t i = 0; i < MAX_WKUP_THREADS; i++) {
         if (wkup_timing[i].status == NOT_USED) {
             wkup_timing[i].time = ticks;
-            _pers_timer_update_data(i, WKUP, ticks);
             wkup_timing[i].thread_id = thread_id;
-            _pers_timer_update_thread_id(i, WKUP, thread_id);
             wkup_timing[i].status = USED;
-            _pers_timer_update_status(i, WKUP, USED);
+            _pers_timer_update_data(i, WKUP, &wkup_timing[i]);
             cmpl = 1;
             break;
         }
@@ -197,9 +198,8 @@ void set_wkup_timer(uint8_t thread_id, uint16_t ticks)
         // TODO: ADD failcheck
         // FIXME this looks like they're dropping the last entry and replacing it
         wkup_timing[MAX_WKUP_THREADS - 1].time = ticks;
-        _pers_timer_update_data(MAX_WKUP_THREADS - 1, WKUP, ticks);
         wkup_timing[MAX_WKUP_THREADS - 1].thread_id = thread_id;
-        _pers_timer_update_thread_id(MAX_WKUP_THREADS - 1, WKUP, thread_id);
+        _pers_timer_update_data(MAX_WKUP_THREADS - 1, WKUP, &wkup_timing[MAX_WKUP_THREADS - 1]);
         refresh_wkup_timers();
     }
 
@@ -221,7 +221,7 @@ void clear_xpr_status(uint8_t thread_id)
     for (uint8_t i = 0; i < MAX_XPR_THREADS; i++) {
         if (xpr_timing[i].thread_id == thread_id) {
             xpr_timing[i].status = NOT_USED;
-            _pers_timer_update_status(i, XPR, NOT_USED);
+            _pers_timer_update_data(i, XPR, &xpr_timing[i]);
         }
     }
     EXIT_CRITICAL_SECTION();
@@ -254,7 +254,7 @@ void refresh_xpr_timers()
             }
 
             xpr_timing[i].time = xpr_timing[i].time - __get_time();
-            _pers_timer_update_data(i, XPR, xpr_timing[i].time);
+            _pers_timer_update_data(i, XPR, &xpr_timing[i]);
 
             if (xpr_timing[i].time <= 0) {
                 // evict thread
@@ -276,8 +276,11 @@ void refresh_xpr_timers()
     }
 
     if (!first) {
-        _pers_timer_update_nxt_thread(XPR, nxt_xpr);
-        _pers_timer_update_nxt_time(XPR, min_xpr);
+        next_d_data next = {
+            .next_thread = nxt_xpr,
+            .next_time = min_xpr
+        };
+        _pers_timer_update_nxt_thread(XPR, &next);
         // set the new pending ISR timer.
         // timerA2_set_CCR0(min_xpr);
         set_timer_xpr(min_xpr);
@@ -301,11 +304,9 @@ void set_expire_timer(uint8_t thread_id, uint32_t ticks)
     for (uint8_t i = 0; i < MAX_XPR_THREADS; i++) {
         if (xpr_timing[i].status == NOT_USED) {
             xpr_timing[i].time = ticks + __get_time();
-            _pers_timer_update_data(i, XPR, __get_time() + ticks);
             xpr_timing[i].thread_id = thread_id;
-            _pers_timer_update_thread_id(i, XPR, thread_id);
             xpr_timing[i].status = USED;
-            _pers_timer_update_status(i, XPR, USED);
+            _pers_timer_update_data(i, XPR, &xpr_timing[i]);
             cmpl = 1;
             break;
         }
@@ -320,9 +321,8 @@ void set_expire_timer(uint8_t thread_id, uint32_t ticks)
         // TODO: ADD fail check
         //
         xpr_timing[MAX_XPR_THREADS - 1].time = ticks;
-        _pers_timer_update_data(MAX_XPR_THREADS - 1, XPR, ticks);
         xpr_timing[MAX_XPR_THREADS - 1].thread_id = thread_id;
-        _pers_timer_update_thread_id(MAX_XPR_THREADS - 1, XPR, thread_id);
+        _pers_timer_update_data(MAX_XPR_THREADS - 1, XPR, &xpr_timing[MAX_XPR_THREADS - 1]);
         refresh_xpr_timers();
     }
 
@@ -383,14 +383,12 @@ void set_periodic_timer(uint8_t thread_id, uint16_t ticks)
 
     for (uint8_t i = 0; i < MAX_PDC_THREADS; i++) {
         if (pdc_timing[i].status == NOT_USED) {
+            pdc_timing[i].time = ticks;
+            pdc_timing[i].thread_id = thread_id;
+            pdc_timing[i].status = USED;
             __set_pdc_timer(__get_thread(thread_id), ticks);
             __set_pdc_period(__get_thread(thread_id), 1);
-            _pers_timer_update_data(i, PDC, ticks);
-            pdc_timing[i].time = ticks;
-            _pers_timer_update_thread_id(i, PDC, thread_id);
-            pdc_timing[i].thread_id = thread_id;
-            _pers_timer_update_status(i, PDC, USED);
-            pdc_timing[i].status = USED;
+            _pers_timer_update_data(i, PDC, &pdc_timing[i]);
             cmpl = 1;
 
             break;
@@ -405,9 +403,8 @@ void set_periodic_timer(uint8_t thread_id, uint16_t ticks)
         // failure
         // TODO: ADD failcheck
         pdc_timing[MAX_PDC_THREADS - 1].time = ticks;
-        _pers_timer_update_data(MAX_PDC_THREADS - 1, PDC, ticks);
         pdc_timing[MAX_PDC_THREADS - 1].thread_id = thread_id;
-        _pers_timer_update_thread_id(MAX_PDC_THREADS - 1, PDC, thread_id);
+        _pers_timer_update_data(MAX_PDC_THREADS - 1, PDC, &pdc_timing[MAX_PDC_THREADS - 1]);
 
         refresh_pdc_timers();
     }
@@ -451,7 +448,7 @@ void refresh_pdc_timers()
             }
 
             pdc_timing[i].time = pdc_timing[i].time - __get_time();
-            _pers_timer_update_data(i, PDC, pdc_timing[i].time);
+            _pers_timer_update_data(i, PDC, &pdc_timing[i]);
 
             if (pdc_timing[i].time < 0 && pdc_timing[i].time > -tol) {
                 if ((min_pdc > -pdc_timing[i].time) || (min_pdc == -pdc_timing[i].time && nxt_pdc > pdc_timing[i].thread_id)) {
@@ -471,8 +468,11 @@ void refresh_pdc_timers()
     }
 
     if (!first) {
-        _pers_timer_update_nxt_thread(PDC, nxt_pdc);
-        _pers_timer_update_nxt_time(PDC, min_pdc);
+        next_d_data next = {
+            .next_thread = nxt_pdc,
+            .next_time = min_pdc,
+        };
+        _pers_timer_update_nxt_thread(PDC, &next);
         // set the new pending ISR timer.
         // timerA2_set_CCR0(min_pdc);
         set_timer_pdc(min_pdc);
@@ -491,7 +491,7 @@ void clear_pdc_status(uint8_t thread_id)
     for (uint8_t i = 0; i < MAX_PDC_THREADS; i++) {
         if (pdc_timing[i].thread_id == thread_id) {
             pdc_timing[i].status = NOT_USED;
-            _pers_timer_update_status(i, PDC, NOT_USED);
+            _pers_timer_update_data(i, PDC, &pdc_timing[i]);
         }
     }
     EXIT_CRITICAL_SECTION();

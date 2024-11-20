@@ -43,4 +43,59 @@
 #error "Unknown compiler, unsure where to store non-volatile memory"
 #endif
 
+typedef enum {
+    STAGE_COMMIT,
+    STAGE_DIRTY,
+} commit_stages;
+
+// All ARGS must be marked as _Atomic
+// The new type _MUST_ be allocated in __nv, or a structure containing it MUST
+// be in __nv
+#define DECLARE_COMMIT_DATA_TYPE(type, ARGS)                     \
+    typedef struct {                                             \
+        ARGS                                                     \
+    } type##_data;                                               \
+    typedef struct {                                             \
+        _Atomic commit_stages stage;                             \
+        type##_data update_data;                                 \
+        type##_data committed_data;                              \
+    } type;                                                      \
+    void type##_init(type* data);                                \
+    void type##_update(type* data, const type##_data* new_data); \
+    bool type##_commit(type* data);                              \
+    bool type##_get_valid(type* data, type##_data* result);
+
+#define DEFINE_COMMIT_DATA_TYPE(type)                           \
+    void type##_init(type* data)                                \
+    {                                                           \
+        data->stage = STAGE_COMMIT;                             \
+        data->update_data = (type##_data) { 0 };                \
+        data->committed_data = (type##_data) { 0 };             \
+    }                                                           \
+    void type##_update(type* data, const type##_data* new_data) \
+    {                                                           \
+        data->update_data = *new_data;                          \
+        data->stage = STAGE_DIRTY;                              \
+    }                                                           \
+    bool type##_commit(type* data)                              \
+    {                                                           \
+        if (data->stage == STAGE_DIRTY) {                       \
+            data->committed_data = data->update_data;           \
+            data->stage = STAGE_COMMIT;                         \
+            return true;                                        \
+        }                                                       \
+        return false;                                           \
+    }                                                           \
+    bool type##_get_valid(type* data, type##_data* result)      \
+    {                                                           \
+        if (data->stage == STAGE_COMMIT) {                      \
+            *result = data->committed_data;                     \
+            return true;                                        \
+        }                                                       \
+        return false;                                           \
+    }
+
+#define DEFINE_COMMIT_DATA(type, name) \
+    __nv type name
+
 #endif /* NV_H_ */

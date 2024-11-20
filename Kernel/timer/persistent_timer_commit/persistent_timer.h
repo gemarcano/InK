@@ -34,12 +34,6 @@
 #define MAX_XPR_THREADS 3
 #define MAX_PDC_THREADS 1
 
-/// Represents whether a structure contains dirty data or not.
-typedef enum {
-    NOT_DIRTY,
-    DIRTY
-} dirty_st;
-
 /// Represents whether a timer is in use or not.
 typedef enum {
     NOT_USED,
@@ -55,66 +49,31 @@ typedef enum {
 
 /** Contains the timing data for a timer.
  */
-typedef struct
-{
-    /// Indicates whether this timer is being used or not.
-    _Atomic used_st status;
-    /// The unique thread ID that's using this timer.
-    _Atomic uint8_t thread_id;
+DECLARE_COMMIT_DATA_TYPE(timing_d,
+                         /// Indicates whether this timer is being used or not.
+                         _Atomic used_st status;
+                         /// The unique thread ID that's using this timer.
+                         _Atomic uint8_t thread_id;
 
-    // FIXME why is this signed?
-    _Atomic int32_t time; /** remaining time for thread execution*/
-} timing_d_;
-
-/** Holds both persistent and dirty timer structures.
- */
-typedef struct
-{
-    timing_d_ persistent;
-    timing_d_ dirty;
-    /// Indicates whether or not there's pending data that needs to be
-    /// committed.
-    _Atomic dirty_st state;
-} timing_d;
+                         // FIXME why is this signed?
+                         _Atomic int32_t time; /** remaining time for thread execution*/
+)
 
 /** Contains the next thread to be executed persistent timer
  */
-typedef struct
-{
-    /// Whether the structure is in use or not.
-    _Atomic used_st status;
-    /// The ID of the next thread candidate.
-    _Atomic uint8_t next_thread;
-    /// The time the next thread candidate should run at (FIXME is this true?)
-    _Atomic uint16_t next_time;
-} next_d_;
-
-/** Holds both persistent and dirty next thread structures.
- */
-typedef struct
-{
-    next_d_ persistent;
-    next_d_ dirty;
-    _Atomic dirty_st state;
-} next_d;
+DECLARE_COMMIT_DATA_TYPE(next_d,
+                         /// The ID of the next thread candidate.
+                         _Atomic uint8_t next_thread;
+                         /// The time the next thread candidate should run at (FIXME is this true?)
+                         _Atomic uint16_t next_time;)
 
 /** Contains system on/off time.
  */
-typedef struct
-{
-    /// The amount of time the system has been on (FIXME units?)
-    _Atomic uint16_t on_time;
-    /// The amount of time the system has been off (FIXME units?)
-    _Atomic uint16_t off_time;
-} pers_time_d_;
-
-/** Holds both persistent and dirty system time structures.
- */
-typedef struct {
-    pers_time_d_ persistent;
-    pers_time_d_ dirty;
-    _Atomic dirty_st state;
-} pers_time_d;
+DECLARE_COMMIT_DATA_TYPE(pers_time_d,
+                         /// The amount of time the system has been on (FIXME units?)
+                         _Atomic uint16_t on_time;
+                         /// The amount of time the system has been off (FIXME units?)
+                         _Atomic uint16_t off_time;)
 
 /** Contains timing data for WakeUp/Expiration/Periodic timer, global time, and
  * next thread to be fired by each timer.
@@ -149,27 +108,7 @@ void _pers_timer_boot_init(void);
  * @param interface The type of the timer to update.
  * @param time_data The data to store in the timer.
  */
-void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface, uint32_t time_data);
-
-/** Updates the thread value of the specified timer.
- *
- * This sets the timer's dirty flag to true.
- *
- * @param idx The index of the timer to update.
- * @param interface The type of the timer to update.
- * @param thread_id Thread ID to store in the timer.
- */
-void _pers_timer_update_thread_id(uint8_t idx, ink_time_interface_t interface, uint8_t thread_id);
-
-/** Updates the status value of the specified timer.
- *
- * This sets the timer's dirty flag to true.
- *
- * @param idx The index of the timer to update.
- * @param interface The type of the timer to update.
- * @param status Status to store in the timer.
- */
-void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface, used_st status);
+void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface, const timing_d_data* data);
 
 /** Updates the next thread to run for the specified timer.
  *
@@ -178,14 +117,7 @@ void _pers_timer_update_status(uint8_t idx, ink_time_interface_t interface, used
  * @param interface The type of the timer to associate a next thread with.
  * @param next_tread The ID of the next thread for executing set for this timer
  */
-void _pers_timer_update_nxt_thread(ink_time_interface_t interface, uint8_t next_thread);
-
-/** Updates the time remaining in the timer for the next event.
- *
- * @param interface The type of the timer to update its next trigger time.
- * @param next_time The remaining time for next interrupt event (FIXME what units?)
- */
-void _pers_timer_update_nxt_time(ink_time_interface_t interface, uint16_t next_time);
+void _pers_timer_update_nxt_thread(ink_time_interface_t interface, const next_d_data* data);
 
 // collect data from the perssistent buffer
 /** Gets the timing structure for the specified timer.
@@ -195,7 +127,7 @@ void _pers_timer_update_nxt_time(ink_time_interface_t interface, uint16_t next_t
  *
  * @return Timing information from the persistent buffer.
  */
-timing_d_ _pers_timer_get(uint8_t idx, ink_time_interface_t interface);
+timing_d_data _pers_timer_get(uint8_t idx, ink_time_interface_t interface);
 
 /** Get the timer data for the specified timer.
  *

@@ -34,6 +34,8 @@
 #ifndef NV_H_
 #define NV_H_
 
+#include <stdatomic.h>
+
 /* defines non-volatile variable */
 #ifdef __GNUC__
 #define __nv __attribute__((section(".nv_vars")))
@@ -51,48 +53,47 @@ typedef enum {
 // All ARGS must be marked as _Atomic
 // The new type _MUST_ be allocated in __nv, or a structure containing it MUST
 // be in __nv
+// This should be intermittent safe, but it is not thread safe.
 #define DECLARE_COMMIT_DATA_TYPE(type, ARGS)                     \
     typedef struct {                                             \
         ARGS                                                     \
     } type##_data;                                               \
     typedef struct {                                             \
         _Atomic commit_stages stage;                             \
-        type##_data update_data;                                 \
+        _Atomic uint8_t valid_index;                             \
+        type##_data data[2];                                     \
         type##_data committed_data;                              \
     } type;                                                      \
     void type##_init(type* data);                                \
     void type##_update(type* data, const type##_data* new_data); \
     bool type##_commit(type* data);                              \
-    bool type##_get_valid(type* data, type##_data* result);
+    type##_data type##_load(type* data);
 
 #define DEFINE_COMMIT_DATA_TYPE(type)                           \
     void type##_init(type* data)                                \
     {                                                           \
         data->stage = STAGE_COMMIT;                             \
-        data->update_data = (type##_data) { 0 };                \
-        data->committed_data = (type##_data) { 0 };             \
+        data->data[0] = (type##_data) { 0 };                    \
+        data->data[1] = (type##_data) { 0 };                    \
+        data->valid_index = 0;                                  \
     }                                                           \
     void type##_update(type* data, const type##_data* new_data) \
     {                                                           \
-        data->update_data = *new_data;                          \
+        data->data[data->valid_index ^ 1] = *new_data;          \
         data->stage = STAGE_DIRTY;                              \
     }                                                           \
     bool type##_commit(type* data)                              \
     {                                                           \
         if (data->stage == STAGE_DIRTY) {                       \
-            data->committed_data = data->update_data;           \
+            atomic_fetch_xor(&data->valid_index, 1);            \
             data->stage = STAGE_COMMIT;                         \
             return true;                                        \
         }                                                       \
         return false;                                           \
     }                                                           \
-    bool type##_get_valid(type* data, type##_data* result)      \
+    type##_data type##_load(type* data)                         \
     {                                                           \
-        if (data->stage == STAGE_COMMIT) {                      \
-            *result = data->committed_data;                     \
-            return true;                                        \
-        }                                                       \
-        return false;                                           \
+        return data->data[data->valid_index];                   \
     }
 
 #define DEFINE_COMMIT_DATA(type, name) \

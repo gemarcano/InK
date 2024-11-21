@@ -146,19 +146,15 @@ void _pers_timer_commit(ink_time_interface_t interface)
 
 timing_d_data _pers_timer_get(uint8_t idx, ink_time_interface_t interface)
 {
-    timing_d_data result;
     switch (interface) {
     case WKUP:
-        timing_d_get_valid(&pers_timers.wkup_timing[idx], &result);
-        break;
+        return timing_d_load(&pers_timers.wkup_timing[idx]);
     case XPR:
-        timing_d_get_valid(&pers_timers.xpr_timing[idx], &result);
-        break;
+        return timing_d_load(&pers_timers.xpr_timing[idx]);
     case PDC:
-        timing_d_get_valid(&pers_timers.pdc_timing[idx], &result);
-        break;
+        return timing_d_load(&pers_timers.pdc_timing[idx]);
     }
-    return result;
+    unreachable();
 }
 
 uint16_t _pers_timer_get_data(uint8_t idx, ink_time_interface_t interface)
@@ -180,15 +176,11 @@ used_st _pers_timer_get_status(uint8_t idx, ink_time_interface_t interface)
 uint8_t _pers_timer_get_nxt_thread(ink_time_interface_t ink_time_interface)
 {
     // get the persistent timer from persistent buffer
-    next_d_data result;
-    next_d_get_valid(&pers_timers.next_info[ink_time_interface], &result);
-    return result.next_thread;
+    return next_d_load(&pers_timers.next_info[ink_time_interface]).next_thread;
 }
 
 uint16_t _pers_timer_get_nxt_time(ink_time_interface_t ink_time_interface)
 {
     // get the persistent timer from persistent buffer
-    next_d_data result;
-    next_d_get_valid(&pers_timers.next_info[ink_time_interface], &result);
-    return result.next_time;
+    return next_d_load(&pers_timers.next_info[ink_time_interface]).next_time;
 }

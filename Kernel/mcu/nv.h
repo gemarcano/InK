@@ -107,7 +107,18 @@ typedef enum {
      *                                                            \
      * @returns A copy of the committed data in the container.    \
      */                                                           \
-    type##_data type##_load(type* data);
+    type##_data type##_load(type* data);                          \
+                                                                  \
+    /** Update and commit data into the container at the same     \
+     *  time.                                                     \
+     *                                                            \
+     * @param[in,out] data Container to update and commit data    \
+     *  into. The container must be initialized.                  \
+     * @param[in] new_data Data to store in the container.        \
+     *                                                            \
+     * @post The new data is committed into the container.        \
+     */                                                           \
+    void type##_store(type* data, const type##_data* new_data);
 
 #define DEFINE_COMMIT_DATA_TYPE(type)                           \
     void type##_init(type* data)                                \
@@ -134,6 +145,11 @@ typedef enum {
     type##_data type##_load(type* data)                         \
     {                                                           \
         return data->data[data->valid_index];                   \
+    }                                                           \
+    void type##_store(type* data, const type##_data* new_data)  \
+    {                                                           \
+        type##_update(data, new_data);                          \
+        type##_commit(data);                                    \
     }
 
 #define DEFINE_COMMIT_DATA(type, name) \

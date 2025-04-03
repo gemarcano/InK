@@ -47,11 +47,12 @@ void _pers_timer_boot_init(void)
 {
     for (uint8_t i = 0; i < MAX_TIMED_THREADS; i++) {
         timing_d_init(&pers_timers.wkup_timing[i]);
-        timing_d_init(&pers_timers.xpr_timing[i]);
-        timing_d_init(&pers_timers.pdc_timing[i]);
-        pers_timers.wkup_timing[i].committed_data.status = NOT_USED;
-        pers_timers.xpr_timing[i].committed_data.status = NOT_USED;
-        pers_timers.pdc_timing[i].committed_data.status = NOT_USED;
+        static const timing_d_data default_ = {
+            .status = NOT_USED,
+        };
+        timing_d_store(&pers_timers.wkup_timing[i], &default_);
+        timing_d_store(&pers_timers.xpr_timing[i], &default_);
+        timing_d_store(&pers_timers.pdc_timing[i], &default_);
     }
 }
 

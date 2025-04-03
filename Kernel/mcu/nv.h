@@ -13,7 +13,7 @@
 // status = "Production"
 //
 //
-// InK is free software: you ca	n redistribute it and/or modify
+// InK is free software: you ca    n redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -54,19 +54,59 @@ typedef enum {
 // The new type _MUST_ be allocated in __nv, or a structure containing it MUST
 // be in __nv
 // This should be intermittent safe, but it is not thread safe.
-#define DECLARE_COMMIT_DATA_TYPE(type, ARGS)                     \
-    typedef struct {                                             \
-        ARGS                                                     \
-    } type##_data;                                               \
-    typedef struct {                                             \
-        _Atomic commit_stages stage;                             \
-        _Atomic uint8_t valid_index;                             \
-        type##_data data[2];                                     \
-        type##_data committed_data;                              \
-    } type;                                                      \
-    void type##_init(type* data);                                \
-    void type##_update(type* data, const type##_data* new_data); \
-    bool type##_commit(type* data);                              \
+#define DECLARE_COMMIT_DATA_TYPE(type, ARGS)                      \
+    typedef struct {                                              \
+        ARGS                                                      \
+    } type##_data;                                                \
+    typedef struct {                                              \
+        _Atomic commit_stages stage;                              \
+        _Atomic uint8_t valid_index;                              \
+        type##_data data[2];                                      \
+        type##_data committed_data;                               \
+    } type;                                                       \
+                                                                  \
+    /** Initialize the nonvolatile container.                     \
+     *                                                            \
+     * @param[out] data Pointer to the container to initialize.   \
+     *  This container must be in __nv memory.                    \
+     *                                                            \
+     * @post Container is initialized, and its memory is zero-ed. \
+     */                                                           \
+    void type##_init(type* data);                                 \
+                                                                  \
+    /** Update the data in the nonvolatile container, and marks   \
+     * it dirty.                                                  \
+     *                                                            \
+     * @param[in,out] data Pointer to the container to update.    \
+     *  This container must be initialized.                       \
+     * @param[in] new_data Pointer to the contents to copy into   \
+     *  the container.                                            \
+     *                                                            \
+     * @post The container contains the new data and is marked    \
+     *  dirty, ready to be committed. Without being committed,    \
+     *  any calls to type##_load will return the old data.        \
+     */                                                           \
+    void type##_update(type* data, const type##_data* new_data);  \
+                                                                  \
+    /** Commits pending data in the container.                    \
+     *                                                            \
+     * @param[in,out] data Container to commit data into. The     \
+     *  container must be initialized.                            \
+     *                                                            \
+     * @returns True if there was data to commit and it was       \
+     *  committed, false otherwise. After being committed, the    \
+     *  new data will be returned from subsequent type##_load     \
+     *  calls.                                                    \
+     */                                                           \
+    bool type##_commit(type* data);                               \
+                                                                  \
+    /** Returns the committed data in the container.              \
+     *                                                            \
+     * @param[in] data The container to retrieve committed data   \
+     *  from. The container must be initialized.                  \
+     *                                                            \
+     * @returns A copy of the committed data in the container.    \
+     */                                                           \
     type##_data type##_load(type* data);
 
 #define DEFINE_COMMIT_DATA_TYPE(type)                           \

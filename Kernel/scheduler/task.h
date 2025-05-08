@@ -36,9 +36,9 @@
 #include "isr/isrmanager.h"
 #include "thread.h"
 
-#define TASK(name) static void_func name(non_volatile_data_t* __buffer)
+#define TASK(name) static struct task_t name(non_volatile_data_t* __buffer)
 
-#define ENTRY_TASK(name) static task_t name(non_volatile_data_t* __buffer, isr_event_t* __event)
+#define ENTRY_TASK(name) static struct task_t name(non_volatile_data_t* __buffer, isr_event_t* __event)
 
 // reads the value from the original stack
 #define __GET(x) ((__buffer)->x)
@@ -51,7 +51,7 @@
 
 // creates a thread
 #define __CREATE(priority, entry) \
-    __create_thread(priority, (entry_task_t)entry, &__persistent_vars[0], &__persistent_vars[1], sizeof(*__persistent_vars))
+    __create_thread(priority, entry, &__persistent_vars[0], &__persistent_vars[1], sizeof(*__persistent_vars))
 
 // puts the thread state into ACTIVE
 #define __SIGNAL(priority)                  \

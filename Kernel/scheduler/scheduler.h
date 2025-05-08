@@ -52,7 +52,7 @@ void __scheduler_run(void);
  * @param[in,out] data_temp
  * @param[in] size size of the struct backing data_org and data_temp
  */
-void __create_thread(uint8_t priority, entry_task_t entry, void* data_org,
+void __create_thread(uint8_t priority, struct task_t entry, void* data_org,
     void* data_temp, size_t size);
 
 // restart thread

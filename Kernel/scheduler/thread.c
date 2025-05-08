@@ -52,16 +52,17 @@ void __tick(thread_t* thread)
         void* buf = thread->buffer.shared_data[thread->buffer._idx];
         // Check if it is the entry task. The entry task always
         // consumes an event in the event queue.
-        if ((void_func)thread->next == (void_func)thread->entry) {
+        // We use type punning in C here for this comparison (and C only)
+        if (thread->next.task == thread->entry.task) {
             // pop an event since the thread most probably woke up due to
             // an event
             isr_event_t* event = __lock_event(thread);
             // push event data to the entry task
-            thread->next = (thread->entry)(buf, event);
+            thread->next = (thread->entry.entry_task)(buf, event);
             // the event should be released (deleted)
             thread->state = TASK_RELEASE_EVENT;
         } else {
-            thread->next = (task_t)(thread->next)(buf);
+            thread->next = (thread->next.task)(buf);
             thread->state = TASK_FINISHED;
             break;
         }
@@ -80,7 +81,8 @@ void __tick(thread_t* thread)
         // copy the real index from temporary index
         thread->buffer.idx = thread->buffer._idx;
         // Task execution finished. Check if the whole tasks are executed (thread finished)
-        if (thread->next == NULL) {
+        // We use type punning in C here for this comparison (and C only)
+        if (thread->next.task == NULL) {
             __disable_interrupt();
             // check if there are any pending events
             if (!__has_events(thread)) {
@@ -88,7 +90,7 @@ void __tick(thread_t* thread)
                 __stop_thread(thread);
             } else {
                 // thread re-starts from the entry task
-                thread->next = (task_t)(void_func)thread->entry;
+                thread->next = thread->entry;
                 // ready to execute tasks again.
                 thread->state = TASK_READY;
             }

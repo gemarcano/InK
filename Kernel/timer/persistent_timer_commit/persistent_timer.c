@@ -59,17 +59,19 @@ void _pers_timer_boot_init(void)
 void _pers_timer_update_data(uint8_t idx, ink_time_interface_t interface, const timing_d_data* data)
 {
     // update the persistent timer dirty buffer
+    timing_d* timer;
     switch (interface) {
     case WKUP:
-        timing_d_update(&pers_timers.wkup_timing[idx], data);
+        timer = &pers_timers.wkup_timing[idx];
         break;
     case XPR:
-        timing_d_update(&pers_timers.xpr_timing[idx], data);
+        timer = &pers_timers.xpr_timing[idx];
         break;
     case PDC:
-        timing_d_update(&pers_timers.pdc_timing[idx], data);
+        timer = &pers_timers.pdc_timing[idx];
         break;
     }
+    timing_d_update(timer, data);
 }
 
 void _pers_timer_update_nxt_thread(ink_time_interface_t ink_time_interface, const next_d_data* data)

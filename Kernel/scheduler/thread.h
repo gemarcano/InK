@@ -58,20 +58,42 @@ typedef struct {
     size_t size;
 } buffer_t;
 
-typedef void (*void_func)(void);
-
-// the task definition (single C function)
-// the parameter param will be passed by the run-time
-// and it holds the thread structure defined below.
-// This really returns task_t, but C just can't describe that syntax...
-typedef void_func (*task_t)(void*);
-
 // type forward declaration, there's a circular dependency between thread.h and
 // isrmanager.h
 typedef struct isr_event_t_ isr_event_t;
 
-// the entry task should take event data as an argument.
-typedef task_t (*entry_task_t)(void*, isr_event_t*);
+// type forward declarate for non_volatile_data, this type must be defined by
+// an application through the __shared macro.
+typedef struct non_volatile_data_ non_volatile_data_t;
+
+/** Struct holding a pointer to a task function.
+ *
+ * This is primarily used because it's not possible to have a function that
+ * returns itself, but it can be worked around through the use of a struct.
+ * Additionally, this way we can encode both the entry task and other tasks
+ * through a union and have them fall under the same type.
+ */
+struct task_t {
+    union {
+        /** Pointer to InK task function.
+         *
+         * @param[in,out] buffer A pointer to the non-volatile storage used by
+         *  the application.
+         *
+         * @returns The next task to execute.
+         */
+        struct task_t (*task)(non_volatile_data_t* buffer);
+        /** Pointer to InK entry function.
+         *
+         * @param[in,out] buffer A pointer to the non-volatile storage used by
+         *  the application.
+         * @param[in,out] event A pointer to an event (that hopefully woke up
+         *  this thread). This could be NULL if there is no event (e.g. we're
+         *  waking up for the first time).
+         */
+        struct task_t (*entry_task)(non_volatile_data_t* buffer, isr_event_t* event);
+    };
+};
 
 // the main thread structure that holds all necessary info
 // to execute the computation represented by the wired
@@ -79,8 +101,8 @@ typedef task_t (*entry_task_t)(void*, isr_event_t*);
 typedef struct {
     uint8_t priority; // thread priority (unique)
     _Atomic state_t state; // thread state
-    entry_task_t entry; // the first task to be executed
-    task_t next; // the current task to be executed
+    struct task_t entry; // the first task to be executed
+    struct task_t next; // the current task to be executed
     buffer_t buffer; // holds task shared persistent variables
     uint16_t sing_timer; // holds the time when the thread will be executed
     uint16_t pdc_timer; // holds the time for "periodic" execution of the thread
@@ -92,10 +114,10 @@ typedef struct {
 // memory. There can only be one of these per translation unit. Also, The data
 // is not shared across translation units, even if this is called in a header.
 #define __shared(first, ...)        \
-    typedef struct {                \
+    struct non_volatile_data_ {     \
         _Alignas(sizeof(int)) first \
             __VA_ARGS__             \
-    } non_volatile_data_t;          \
+    };                              \
     static __nv non_volatile_data_t __persistent_vars[2]
 
 // runs one task inside the current thread.

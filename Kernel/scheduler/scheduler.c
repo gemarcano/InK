@@ -50,7 +50,7 @@ static __nv thread_t* _thread;
 
 static _Atomic __nv uint8_t _sched_state;
 
-void __scheduler_boot_init()
+void __scheduler_boot_init(void)
 {
     _thread = NULL;
 
@@ -65,13 +65,13 @@ void __scheduler_boot_init()
 }
 
 // Assigns a slot to a thread. Should be called ONLY at the first system boot
-void __create_thread(uint8_t priority, entry_task_t entry, void* data_org,
+void __create_thread(uint8_t priority, struct task_t entry, void* data_org,
     void* data_temp, size_t size)
 {
     // init properties
     _threads[priority].priority = priority;
     _threads[priority].entry = entry;
-    _threads[priority].next = (task_t)(void_func)entry;
+    _threads[priority].next = entry;
     _threads[priority].state = THREAD_STOPPED;
 
     // init shared buffer
@@ -93,7 +93,7 @@ void __stop_thread(thread_t* thread)
 void __evict_thread(thread_t* thread)
 {
     __priority_remove(thread->priority, &_priorities);
-    thread->next = NULL;
+    thread->next = (struct task_t) { NULL };
     thread->state = THREAD_STOPPED;
 }
 
@@ -135,7 +135,7 @@ uint16_t __get_pdc_period(thread_t* thread)
 // puts the thread in active state
 void __start_thread(thread_t* thread)
 {
-    thread->next = (task_t)(void_func)thread->entry;
+    thread->next = thread->entry;
     __priority_insert(thread->priority, &_priorities);
     thread->state = TASK_READY;
 }
@@ -202,11 +202,10 @@ void __scheduler_run()
                 break;
             }
             _sched_state = SCHED_SELECT;
-            __disable_interrupt();
             // check the ready queue for the last time
             if (!__next_thread()) {
+                // Don't disable interrupts as we need them to wake up!
                 __mcu_sleep();
-                __enable_interrupt();
             }
         }
     }

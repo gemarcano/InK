@@ -110,7 +110,7 @@ void __release_event(thread_t* thread);
 
 /** Checks if the event slots are full for the given thread.
  *
- * This must be called from a cristical section or an ISR
+ * This must be called from a critical section or an ISR.
  *
  * @param[in,out] thread The thread to check its event queue.
  *

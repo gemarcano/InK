@@ -50,6 +50,10 @@ typedef enum {
     STAGE_DIRTY,
 } commit_stages;
 
+/** Clears the content of non-volatile memory used by InK.
+ */
+void nv_clear(void);
+
 // All ARGS must be marked as _Atomic
 // The new type _MUST_ be allocated in __nv, or a structure containing it MUST
 // be in __nv

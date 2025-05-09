@@ -48,6 +48,7 @@ int main(void)
 
     // if this is the first boot
     if (__inited != RANDOM_INIT_VALUE) {
+        nv_clear();
         // init the scheduler state
         __scheduler_boot_init();
         // init the event handler

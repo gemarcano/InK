@@ -37,6 +37,7 @@
 #include <asimple/systick.h>
 
 #include "am_bsp.h"
+#include "am_hal_pwrctrl.h"
 #include "am_mcu_apollo.h"
 #include "am_util.h"
 
@@ -59,11 +60,33 @@ void __mcu_init(void)
     // initialize systick
     systick_reset();
     systick_start();
+
+    // FIXME register GPIO interrupt for triggering sleep
 }
+
+void Reset_Handler(void); // This must be defined by the application, as we jump to
+                          // it to re-initialize ink upon waking up.
 
 void __mcu_sleep(void)
 {
-    // FIXME
+    // FIXME is this OK? For small programs it is, but is this OK of an assumption?
+    // Explicitly enable power to only the bottom half of flash
+    am_hal_pwrctrl_memory_enable(AM_HAL_PWRCTRL_MEM_FLASH_512K);
+
+    // Request that only 64KB of SRAM is retained
+    am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL);
+    am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM);
+
+    uint32_t DEVPWREN = PWRCTRL->DEVPWREN;
+    // Power everything down
+    PWRCTRL->DEVPWREN = 0;
+
+    am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
+
+    // Restore peripheral power
+    PWRCTRL->DEVPWREN = DEVPWREN;
+
+    Reset_Handler();
 }
 
 void __enable_interrupt(void)
@@ -93,4 +116,11 @@ void exit_critical_section(critical_section* section)
 {
     __set_PRIMASK(section->state);
     section->state = 0;
+}
+
+void nv_clear(void)
+{
+    extern unsigned char* _nv;
+    extern unsigned char* _nv_end;
+    memset(_nv, 0, _nv_end - _nv);
 }
